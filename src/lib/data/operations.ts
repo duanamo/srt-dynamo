@@ -18,14 +18,17 @@ import type {
 /** Deletion result: the new dataset on success, or a human-readable reason. */
 export type DeleteResult = { ok: true; data: AppData } | { ok: false; reason: string };
 
+/** Returns the user with the given id, or undefined if none matches. */
 export function findUser(data: AppData, id: string): User | undefined {
 	return data.users.find((u) => u.id === id);
 }
 
+/** Returns the project with the given id, or undefined if none matches. */
 export function findProject(data: AppData, id: string): Project | undefined {
 	return data.projects.find((p) => p.id === id);
 }
 
+/** Returns the report with the given id, or undefined if none matches. */
 export function findReport(data: AppData, id: string): StatusReport | undefined {
 	return data.reports.find((r) => r.id === id);
 }

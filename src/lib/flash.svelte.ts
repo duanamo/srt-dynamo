@@ -5,6 +5,7 @@ type Flash = { kind: 'success' | 'error'; text: string };
 
 let current = $state<Flash | null>(null);
 
+/** A singleton reactive slot holding the current transient flash message (or null). */
 export const flash = {
 	get current() {
 		return current;

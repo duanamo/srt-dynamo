@@ -15,10 +15,12 @@ import {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PERIOD_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 
+/** True when an error map is empty (no field failed validation). */
 export function isValid(errors: ValidationErrors): boolean {
 	return Object.keys(errors).length === 0;
 }
 
+/** Validates a user; returns a field → message map (empty when valid). */
 export function validateUser(input: UserInput): ValidationErrors {
 	const errors: ValidationErrors = {};
 	if (!input.name.trim()) errors.name = 'Name is required.';
@@ -28,6 +30,7 @@ export function validateUser(input: UserInput): ValidationErrors {
 	return errors;
 }
 
+/** Validates a project (incl. that the owner exists in `data`); returns a field → message map. */
 export function validateProject(input: ProjectInput, data: AppData): ValidationErrors {
 	const errors: ValidationErrors = {};
 	if (!input.name.trim()) errors.name = 'Name is required.';
@@ -38,6 +41,7 @@ export function validateProject(input: ProjectInput, data: AppData): ValidationE
 	return errors;
 }
 
+/** Validates a report (incl. that the project and author exist in `data`); returns a field → message map. */
 export function validateReport(input: ReportInput, data: AppData): ValidationErrors {
 	const errors: ValidationErrors = {};
 	if (!input.projectId) errors.projectId = 'Select a project.';

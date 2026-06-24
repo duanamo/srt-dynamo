@@ -15,9 +15,10 @@
 		FolderKanban
 	} from '@lucide/svelte';
 
-	// `new Date()` is sampled per recomputation (i.e. when store.data changes),
-	// not on every clock tick — a dashboard left open across a month boundary
-	// without any data change shows the prior period until the next mutation/nav.
+	// Intentional: `new Date()` is sampled per recomputation (i.e. when store.data
+	// changes), not on every clock tick — a runes $derived has no time dependency,
+	// so a dashboard left open across a month boundary without any data change shows
+	// the prior period until the next mutation/navigation. Acceptable for this MVP.
 	const stats = $derived(dashboardStats(store.data, new Date()));
 
 	let confirmAction = $state<'reset' | 'clear' | null>(null);

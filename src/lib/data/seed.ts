@@ -11,6 +11,10 @@ import {
 } from '$lib/types';
 import { periodOf } from './operations';
 
+/**
+ * Builds the sample dataset as a fully cross-referenced `AppData`, with reporting
+ * periods derived from `now` (the current and previous calendar months).
+ */
 export function buildSeed(now: Date): AppData {
 	const thisPeriod = periodOf(now);
 	const lastPeriod = periodOf(new Date(now.getFullYear(), now.getMonth() - 1, 1));
