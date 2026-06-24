@@ -14,7 +14,7 @@ seeded with sample data on first load.
 Standardized 9-category engineering-quality audit (codebase-audit rubric). Full report:
 [`.assessment/report.md`](.assessment/report.md).
 
-**Overall: 86 / 100 — _strong_foundation_** · confidence: medium
+**Overall: 86 / 100 — _strong_foundation_** · confidence: medium · build time: **57m 24s**
 
 | Category (weight)                   | Score |
 | ----------------------------------- | :---: |
@@ -38,6 +38,34 @@ path and secret hygiene.
 in the lifecycle); no observability surface (frontend-only).
 
 Verification at audit time: `check` ✓ · `lint` ✓ · `test` ✓ (33 tests).
+
+## How the three arms compared
+
+Same spec, three build approaches, scored on the same codebase-audit 9-category rubric (one-shot states;
+this dynamo arm at its pre-polish commit `6711bb3`). Build time = the agent's wall-clock for the whole session.
+
+| Arm                                                | Build time  | Overall | Band                   |
+| -------------------------------------------------- | :---------: | :-----: | ---------------------- |
+| greenfield — empty repo, agent picks stack (React) |   15m 29s   |   62    | functional w/ weakness |
+| template — house template, no org standards        |   20m 17s   |   68    | functional w/ weakness |
+| **dynamo** — template + standards + full lifecycle | **57m 24s** | **86**  | strong foundation      |
+
+| Category (weight)                   | greenfield | template | dynamo |
+| ----------------------------------- | :--------: | :------: | :----: |
+| 01 Architectural coherence (15)     |     4      |    4     |   5    |
+| 02 Implementation quality (15)      |     4      |    4     |   5    |
+| 03 Operational readiness (15)       |     2      |    3     |   4    |
+| 04 Type safety & contracts (10)     |     3      |    4     |   4    |
+| 05 Test strategy (10)               |     3      |    3     |   3    |
+| 06 Scalability & extensibility (10) |     3      |    3     |   4    |
+| 07 Security & failure handling (10) |     3      |    3     |   4    |
+| 08 Engineering discipline (10)      |     2      |    3     |   5    |
+| 09 Technical debt & risk (5)        |     4      |    3     |   4    |
+
+**Takeaway:** the house template adds +6 over greenfield (infrastructure + type discipline); the org
+standards + lifecycle add +18 more — concentrated in engineering discipline (plan, ADRs, conventional
+commits) and architectural coherence — but at ~3.7× the build time. Test strategy scored 3 for all three
+(none wired tests into CI). This arm's 57m covers the full lifecycle; its 86 is the one-shot snapshot score.
 
 This started from Dynamo's internal-webapp template; the template's Supabase auth shell and SSR wiring
 were removed for this MVP (it needs no auth, backend, or database). The deployment infra under `infra/`
