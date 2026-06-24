@@ -1,0 +1,74 @@
+rubric_version: '1.0.0'
+
+# Category weights — must sum to 100.
+weights:
+  architectural_coherence: 15
+  implementation_quality: 15
+  operational_readiness: 15
+  type_safety_contracts: 10
+  test_strategy: 10
+  scalability_extensibility: 10
+  security_failure_handling: 10
+  engineering_discipline: 10
+  technical_debt_risk: 5
+
+# Deterministic aggregation math. validate.py implements these exactly.
+aggregation:
+  weighted_per_category: 'round(score / 5 * weight_pct, 2)'
+  overall_score: 'round(sum(weighted_per_category), 1)'
+  range: '0.0 to 100.0'
+  partial_run: 'overall_score = null; weighted_sum_partial = round(sum, 1) for transparency'
+  tolerance: 0.01 # validate.py allows this much float drift
+
+# Confidence semantics — referenced by all categories.
+confidence:
+  high: 'Direct evidence across the core/representative files for this category.'
+  medium: 'Sufficient evidence to score, but limited by surface area, sampling, or partial access.'
+  low: 'Repo not buildable, files inaccessible, or repo purpose ambiguous. Score is provisional.'
+
+# Score caps — hard ceilings enforced by validate.py.
+# When `when` fires (with cited evidence), score is clamped to `cap_at`.
+# raw_score preserves the scorer's pre-cap judgment.
+score_caps:
+  implementation_quality:
+    cap_at: 3
+    when: 'build or typecheck fails AND no documented reason in README/CLAUDE.md'
+    evidence_required_pattern: "^command:[A-Za-z0-9_\\-]+#exit=[1-9]\\d*$"
+
+  operational_readiness:
+    cap_at: 2
+    when: 'no run/deploy/config path discoverable (no scripts, no Dockerfile, no README run section)'
+    evidence_required_pattern: '^structural:no-runnable-path$'
+
+  test_strategy:
+    cap_at: 3
+    when: 'no test files exist anywhere in repo (excluding examples/)'
+    evidence_required_pattern: '^(?:command:find-tests#exit=0|structural:no-tests-found)$'
+
+# Final score → band mapping.
+bands:
+  - { range: [90, 100], label: 'exceptional' }
+  - { range: [75, 89], label: 'strong_foundation' }
+  - { range: [60, 74], label: 'functional_with_weakness' }
+  - { range: [40, 59], label: 'fragile' }
+  - { range: [0, 39], label: 'critically_immature' }
+
+# Citation grammar — canonical regex, mirrored in validate.py and schema.json.
+# CANONICAL CITATION REGEX — this exact string must equal `schema.json#/definitions/citation/pattern`.
+# validate.py loads this value into `CITATION_RE` and is the runtime authority.
+# validate.py --self-test asserts byte-equality between this string and schema.json;
+# any drift fails the test, so silent divergence is impossible.
+# If you change this, update schema.json (same string) and bump rubric_version.
+citation_regex: "^(?:(?!/|\\.\\.)[A-Za-z0-9_./+@()\\[\\]\\-]+:\\d+(?:-\\d+)?|command:[A-Za-z0-9_\\-]+(?:#exit=\\d+)?|structural:[A-Za-z0-9_\\-]+)$"
+
+# Per-category minimum evidence counts. Each category file restates this for clarity.
+minimum_evidence_count:
+  architectural_coherence: 3
+  implementation_quality: 3
+  operational_readiness: 3
+  type_safety_contracts: 2
+  test_strategy: 2
+  scalability_extensibility: 2
+  security_failure_handling: 3
+  engineering_discipline: 3
+  technical_debt_risk: 2

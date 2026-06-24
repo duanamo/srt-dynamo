@@ -16,8 +16,16 @@ seeded with sample data on first load.
 > discipline + architecture gains were banked at _plan_ time, which is why the pre-polish snapshot already
 > scored 86.
 
-Standardized 9-category engineering-quality audit (codebase-audit rubric). Full report:
-[`.assessment/report.md`](.assessment/report.md).
+Standardized 9-category engineering-quality audit (codebase-audit rubric v1.0.0).
+
+**Methodology & evidence:**
+
+- [`.assessment/report.md`](.assessment/report.md) — full report, **one-shot** snapshot (`6711bb3`)
+- [`.assessment/report-final.md`](.assessment/report-final.md) — full report, **full-lifecycle** product (`0c1e4f6`)
+- [`.assessment/METHODOLOGY.md`](.assessment/METHODOLOGY.md) — how scoring works (categories, weights, caps, evidence rules)
+- [`.assessment/rubric.yml`](.assessment/rubric.yml) — canonical rubric (weights, score caps, bands)
+- [`.assessment/categories/`](.assessment/categories) — per-category scores with cited `file:line` evidence
+- [`.assessment/report.json`](.assessment/report.json) — machine-readable output
 
 **Overall: 86 / 100 — _strong_foundation_** · confidence: medium · build time: **57m 24s**
 
