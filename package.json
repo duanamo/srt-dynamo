@@ -1,0 +1,57 @@
+{
+	"name": "internal-webapp-template",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"engines": {
+		"node": ">=24"
+	},
+	"scripts": {
+		"dev": "NODE_OPTIONS='--max-http-header-size=32768' vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write .",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"gen:types": "echo 'ERROR: Update YOUR_PROJECT_ID in this script first (package.json → scripts → gen:types)' && exit 1"
+	},
+	"dependencies": {
+		"@supabase/ssr": "^0.10.2",
+		"@supabase/supabase-js": "^2.105.3"
+	},
+	"devDependencies": {
+		"@eslint/js": "^10.0.1",
+		"@fontsource-variable/inter": "^5.2.8",
+		"@internationalized/date": "^3.12.1",
+		"@lucide/svelte": "^1.14.0",
+		"@sveltejs/adapter-node": "^5.5.4",
+		"@sveltejs/kit": "^2.59.1",
+		"@sveltejs/vite-plugin-svelte": "^7.1.1",
+		"@tailwindcss/vite": "^4.2.4",
+		"@types/node": "^24.13.1",
+		"bits-ui": "^2.18.1",
+		"clsx": "^2.1.1",
+		"eslint": "^10.5.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-svelte": "^3.19.0",
+		"globals": "^17.7.0",
+		"layerchart": "^2.0.0-next.48",
+		"prettier": "^3.8.4",
+		"prettier-plugin-svelte": "^4.1.1",
+		"prettier-plugin-tailwindcss": "^0.8.0",
+		"svelte": "^5.55.5",
+		"svelte-check": "^4.4.8",
+		"tailwind-merge": "^3.5.0",
+		"tailwind-variants": "^3.2.2",
+		"tailwindcss": "^4.2.4",
+		"tailwindcss-animate": "^1.0.7",
+		"tw-animate-css": "^1.4.0",
+		"typescript": "~6.0.3",
+		"typescript-eslint": "^8.62.0",
+		"vite": "^8.0.10",
+		"vitest": "^4.1.9"
+	}
+}

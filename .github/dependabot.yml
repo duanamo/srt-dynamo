@@ -1,0 +1,47 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: dev
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      svelte-toolchain:
+        patterns:
+          - svelte
+          - svelte-check
+          - '@sveltejs/*'
+          - vite
+      tailwind:
+        patterns:
+          - tailwindcss
+          - '@tailwindcss/*'
+          - tailwind-merge
+          - tailwind-variants
+          - tailwindcss-animate
+          - tw-animate-css
+      shadcn-deps:
+        patterns:
+          - bits-ui
+          - 'lucide*'
+          - '@lucide/*'
+          - layerchart
+          - '@internationalized/*'
+      supabase:
+        patterns:
+          - '@supabase/*'
+      types-and-tooling:
+        patterns:
+          - typescript
+          - postcss
+          - clsx
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: dev
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3

@@ -1,0 +1,27 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
+  prod:
+    image: ghcr.io/dynamo-technologies/YOUR_APP_NAME:main
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+
+  dev:
+    image: ghcr.io/dynamo-technologies/YOUR_APP_NAME:dev
+    restart: unless-stopped
+    env_file:
+      - .env.dev
+
+volumes:
+  caddy_data:
+  caddy_config:

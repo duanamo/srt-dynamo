@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "branching": "trunk",
+  "integrationBranch": "dev",
+  "enforcement": "warn",
+  "hooks": {
+    "commitMsg": "warn",
+    "prePush": "warn",
+    "secretScan": "strict"
+  },
+  "workTracking": {
+    "provider": "github",
+    "configuredBy": "dynamo-init",
+    "detectedFrom": "git-remote",
+    "idPattern": "#{id}",
+    "branchPattern": "issue/{id}-{slug}",
+    "closeSyntax": "Closes #{id}",
+    "capabilities": {
+      "view": true,
+      "create": true,
+      "list": true,
+      "comment": true,
+      "close": true
+    },
+    "commands": {
+      "viewWorkItem": "gh issue view {id} --json title,body,state,comments",
+      "createWorkItem": "gh issue create",
+      "listWorkItems": "gh issue list"
+    }
+  },
+  "artifactBindings": {
+    "planArtifact": "plans/{id}-{slug}.md",
+    "decisionRecord": "decisions/{sequence}-{slug}.md"
+  },
+  "stack": {
+    "frontend": "sveltekit",
+    "backend": "none",
+    "database": "none",
+    "auth": "none",
+    "cloud": "none"
+  },
+  "repoCommands": {
+    "verify": "npm run check && npm run lint && npm run test",
+    "test": "npm run test",
+    "lint": "npm run lint"
+  },
+  "lifecycle": {
+    "track": "gate",
+    "plan": "gate",
+    "audit": "checkpoint",
+    "decide": "gate",
+    "verify": "gate",
+    "review": "gate",
+    "ship": "gate"
+  }
+}

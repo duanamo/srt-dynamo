@@ -1,0 +1,82 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run check
+
+  build-and-deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lowercase image name
+        run: echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+
+      - name: Copy infra files to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: 'infra/docker-compose.prod.yml,infra/Caddyfile'
+          target: /opt/app
+          strip_components: 1
+
+      - name: Write env file and deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: PROD_PUBLIC_SUPABASE_URL,PROD_PUBLIC_SUPABASE_PUBLISHABLE_KEY,PROD_SUPABASE_SECRET_KEY,PROD_ORIGIN
+          script: |
+            cd /opt/app
+            cat > .env.prod << EOF
+            PUBLIC_SUPABASE_URL=$PROD_PUBLIC_SUPABASE_URL
+            PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PROD_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+            SUPABASE_SECRET_KEY=$PROD_SUPABASE_SECRET_KEY
+            ORIGIN=$PROD_ORIGIN
+            EOF
+            docker compose -f docker-compose.prod.yml pull prod
+            docker compose -f docker-compose.prod.yml up -d prod caddy
+        env:
+          PROD_PUBLIC_SUPABASE_URL: ${{ secrets.PROD_PUBLIC_SUPABASE_URL }}
+          PROD_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.PROD_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          PROD_SUPABASE_SECRET_KEY: ${{ secrets.PROD_SUPABASE_SECRET_KEY }}
+          PROD_ORIGIN: ${{ secrets.PROD_ORIGIN }}

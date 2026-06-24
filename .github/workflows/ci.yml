@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npx svelte-check --tsconfig ./tsconfig.json
+
+      - name: Build
+        run: npm run build
+        env:
+          # Build-time stubs — adapter-node uses $env/dynamic/* so real values
+          # are read at container runtime, not at build. These just satisfy
+          # any code that touches the env during the SvelteKit build step.
+          PUBLIC_SUPABASE_URL: https://stub.supabase.co
+          PUBLIC_SUPABASE_PUBLISHABLE_KEY: stub
+          SUPABASE_SECRET_KEY: stub
+          ORIGIN: http://localhost:3000

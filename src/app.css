@@ -1,0 +1,303 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@fontsource-variable/inter';
+
+@plugin 'tailwindcss-animate';
+
+@custom-variant dark (&:is(.dark *));
+
+@utility container {
+	margin-inline: auto;
+	padding-inline: 2rem;
+	@media (width >= --theme(--breakpoint-sm)) {
+		max-width: none;
+	}
+	@media (width >= 1400px) {
+		max-width: 1400px;
+	}
+}
+
+@theme {
+	/* Dynamo brand palette — primary scale anchored on Dynamo Red #F05154 */
+	--color-primary-50: #fff1f1;
+	--color-primary-100: #ffe0e0;
+	--color-primary-200: #ffc7c8;
+	--color-primary-300: #ffa0a1;
+	--color-primary-400: #f05154;
+	--color-primary-500: #e23a3d;
+	--color-primary-600: #c92024;
+	--color-primary-700: #a91418;
+	--color-primary-800: #8c1316;
+	--color-primary-900: #741416;
+	--color-primary-950: #420708;
+
+	--color-dark-400: #4a4a49;
+	--color-dark-500: #343433;
+	--color-dark-600: #1e1e1d;
+	--color-dark-700: #171716;
+
+	/* Dynamo brand colors — direct hex tokens straight from the brand guide */
+	--color-brand-red: #f05154;
+	--color-brand-black: #343433;
+	--color-brand-blue: #5789c7;
+	--color-brand-grey: #c1c5d1;
+	--color-brand-white: #ffffff;
+
+	--color-success: #16a34a;
+	--color-warning: #eab308;
+	--color-danger: #dc2626;
+	/* Info uses Dynamo Blue — informational/positive-neutral signal */
+	--color-info: #5789c7;
+
+	/* Semantic colors (resolve from CSS variables) */
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+
+	/* Sidebar */
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+
+	/* Charts */
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+
+	/* Typography */
+	--font-sans: 'Inter Variable', sans-serif;
+
+	/* Radii */
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ── Light theme ─────────────────────────────────────── */
+@layer base {
+	:root {
+		--background: oklch(1 0 0);
+		--foreground: oklch(0.145 0 0);
+		--card: oklch(1 0 0);
+		--card-foreground: oklch(0.145 0 0);
+		--popover: oklch(1 0 0);
+		--popover-foreground: oklch(0.145 0 0);
+		/* Dynamo Red #F05154 */
+		--primary: oklch(0.638 0.211 25.4);
+		--primary-foreground: oklch(1 0 0);
+		/* Surfaces tinted with Dynamo Grey/Blue hue (264) so neutrals feel brand-aligned */
+		--secondary: oklch(0.97 0.005 264);
+		--secondary-foreground: oklch(0.205 0 0);
+		--muted: oklch(0.97 0.008 264);
+		--muted-foreground: oklch(0.556 0.015 264);
+		/* Accent = Dynamo Blue 10% tint — for hover/highlight without competing with primary red */
+		--accent: oklch(0.94 0.025 254.7);
+		--accent-foreground: oklch(0.205 0 0);
+		--destructive: oklch(0.577 0.245 27.325);
+		--destructive-foreground: oklch(1 0 0);
+		/* Borders/inputs derived from Dynamo Grey #C1C5D1 instead of pure neutral */
+		--border: oklch(0.905 0.012 264);
+		--input: oklch(0.905 0.012 264);
+		--ring: oklch(0.638 0.211 25.4);
+		--radius: 0.625rem;
+		/* Brand-anchored chart palette: Red, Blue, Grey + matched tints */
+		--chart-1: oklch(0.638 0.211 25.4); /* Dynamo Red */
+		--chart-2: oklch(0.611 0.116 254.7); /* Dynamo Blue */
+		--chart-3: oklch(0.65 0.03 264); /* Dynamo Grey, darkened for legibility */
+		--chart-4: oklch(0.74 0.16 25.4); /* Red 75% tint */
+		--chart-5: oklch(0.72 0.085 254.7); /* Blue 75% tint */
+		--sidebar: oklch(0.985 0.005 264);
+		--sidebar-foreground: oklch(0.145 0 0);
+		--sidebar-primary: oklch(0.638 0.211 25.4);
+		--sidebar-primary-foreground: oklch(1 0 0);
+		--sidebar-accent: oklch(0.94 0.025 254.7);
+		--sidebar-accent-foreground: oklch(0.205 0 0);
+		--sidebar-border: oklch(0.905 0.012 264);
+		--sidebar-ring: oklch(0.638 0.211 25.4);
+	}
+
+	/* ── Dark theme (Dynamo Black + warm hue) ─────────── */
+	.dark {
+		/* Hue shifted 90 → 95 to better track Dynamo Black (#343433) */
+		--background: oklch(0.155 0.005 95);
+		--foreground: oklch(0.925 0.003 95);
+		/* Card lifted closer to actual Dynamo Black oklch (~0.33) */
+		--card: oklch(0.3 0.003 95);
+		--card-foreground: oklch(0.925 0.003 95);
+		--popover: oklch(0.155 0.005 95);
+		--popover-foreground: oklch(0.925 0.003 95);
+		--primary: oklch(0.638 0.211 25.4);
+		--primary-foreground: oklch(1 0 0);
+		--secondary: oklch(0.22 0.005 264);
+		--secondary-foreground: oklch(0.925 0.003 95);
+		--muted: oklch(0.22 0.005 264);
+		--muted-foreground: oklch(0.7 0.015 264);
+		/* Accent = Dynamo Blue, dark variant for hover/highlight surfaces */
+		--accent: oklch(0.32 0.05 254.7);
+		--accent-foreground: oklch(0.925 0.003 95);
+		--destructive: oklch(0.704 0.191 22.216);
+		--destructive-foreground: oklch(1 0 0);
+		--border: oklch(0.35 0.012 264);
+		--input: oklch(0.35 0.012 264);
+		--ring: oklch(0.638 0.211 25.4);
+		--chart-1: oklch(0.638 0.211 25.4); /* Dynamo Red */
+		--chart-2: oklch(0.611 0.116 254.7); /* Dynamo Blue */
+		--chart-3: oklch(0.7 0.03 264); /* Dynamo Grey */
+		--chart-4: oklch(0.74 0.16 25.4); /* Red 75% tint */
+		--chart-5: oklch(0.72 0.085 254.7); /* Blue 75% tint */
+		--sidebar: oklch(0.2 0.004 95);
+		--sidebar-foreground: oklch(0.925 0.003 95);
+		--sidebar-primary: oklch(0.638 0.211 25.4);
+		--sidebar-primary-foreground: oklch(1 0 0);
+		--sidebar-accent: oklch(0.32 0.05 254.7);
+		--sidebar-accent-foreground: oklch(0.925 0.003 95);
+		--sidebar-border: oklch(0.35 0.012 264);
+		--sidebar-ring: oklch(0.638 0.211 25.4);
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground font-sans antialiased;
+	}
+	button,
+	[role='button'],
+	a,
+	select,
+	summary,
+	[type='button'],
+	[type='submit'],
+	[type='reset'] {
+		cursor: pointer;
+	}
+}
+
+/* ── Autofill override ──────────────────────────────── */
+/* Outside @layer base with !important to beat Chrome's UA autofill styles.
+   Uses CSS variables so it works for both light and dark mode in one rule. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:autofill,
+textarea:-webkit-autofill,
+textarea:autofill,
+select:-webkit-autofill,
+select:autofill {
+	-webkit-box-shadow: 0 0 0 1000px var(--background) inset !important;
+	-webkit-text-fill-color: var(--foreground) !important;
+	caret-color: var(--foreground);
+	transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ── shadcn-svelte data-attribute variants ───────────── */
+
+@custom-variant data-open {
+	&:where([data-state='open']),
+	&:where([data-open]:not([data-open='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-closed {
+	&:where([data-state='closed']),
+	&:where([data-closed]:not([data-closed='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-checked {
+	&:where([data-state='checked']),
+	&:where([data-checked]:not([data-checked='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-unchecked {
+	&:where([data-state='unchecked']),
+	&:where([data-unchecked]:not([data-unchecked='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-selected {
+	&:where([data-selected]) {
+		@slot;
+	}
+}
+
+@custom-variant data-disabled {
+	&:where([data-disabled='true']),
+	&:where([data-disabled]:not([data-disabled='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-active {
+	&:where([data-state='active']),
+	&:where([data-active]:not([data-active='false'])) {
+		@slot;
+	}
+}
+
+@custom-variant data-horizontal {
+	&:where([data-orientation='horizontal']) {
+		@slot;
+	}
+}
+
+@custom-variant data-vertical {
+	&:where([data-orientation='vertical']) {
+		@slot;
+	}
+}
+
+@utility no-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+/* Body-text links — semantic blue, use on raw <a> in copy.
+   Buttons that look like links should use <Button variant="link"> instead. */
+@utility link {
+	color: var(--color-brand-blue);
+	text-decoration-line: underline;
+	text-underline-offset: 2px;
+	text-decoration-color: color-mix(in oklch, var(--color-brand-blue) 40%, transparent);
+	transition: text-decoration-color 150ms;
+	&:hover {
+		text-decoration-color: var(--color-brand-blue);
+	}
+}

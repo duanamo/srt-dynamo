@@ -1,0 +1,7 @@
+your-app.dynamo.works {
+	reverse_proxy prod:3000
+}
+
+your-app-dev.dynamo.works {
+	reverse_proxy dev:3000
+}
