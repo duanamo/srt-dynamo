@@ -1,0 +1,58 @@
+{
+	"category": "type_safety_contracts",
+	"rubric_version": "1.0.0",
+	"raw_score": 4,
+	"score": 4,
+	"cap_applied": false,
+	"cap_reason": null,
+	"weight_pct": 10,
+	"weighted": 8.0,
+	"confidence": "high",
+	"confidence_reason": null,
+	"evidence": [
+		{
+			"claim": "TypeScript strict mode is enabled in the primary tsconfig, with checkJs on as well.",
+			"citation": "tsconfig.json:3-12"
+		},
+		{
+			"claim": "svelte-check passes with 0 errors across the project, confirming the strict config is satisfied.",
+			"citation": "command:npm-check#exit=0"
+		},
+		{
+			"claim": "Domain types use const-tuple enums with derived union types and Omit-based input types, giving precise compile-time contracts (Role/ProjectStatus/OverallStatus, UserInput/ReportInput).",
+			"citation": "src/lib/types.ts:6-62"
+		},
+		{
+			"claim": "All external/untrusted input (form payloads, the persisted localStorage blob) is runtime-validated: validation.ts checks every field and load() verifies the parsed envelope shape and version before trusting it.",
+			"citation": "src/lib/data/store.svelte.ts:20-41"
+		}
+	],
+	"strengths": [
+		{
+			"point": "Runtime validation guards every boundary: form input via validateUser/Project/Report and the persisted blob via a shape+version check on hydrate.",
+			"citation": "src/lib/validation.ts:22-56"
+		},
+		{
+			"point": "Deletion guards return a discriminated-union result ({ok:true}|{ok:false,reason}) instead of throwing, making the contract explicit at the type level.",
+			"citation": "src/lib/types.ts:67-68"
+		}
+	],
+	"risks": [
+		{
+			"point": "The only explicit any usage is in the shadcn-style utility generics in utils.ts; it is suppressed via eslint-disable and confined to component-prop helpers, not domain code.",
+			"citation": "src/lib/utils.ts:8-12"
+		},
+		{
+			"point": "Validation is hand-rolled regex/field checks rather than a schema library (Zod); adequate here but no generated/shared contract artifact.",
+			"citation": "src/lib/validation.ts:15-16"
+		}
+	],
+	"score_movers": {
+		"up_one": {
+			"condition": "Adopt a schema validator (e.g. Zod) shared between form validation and the localStorage hydrate path to give one declarative contract with inferred types.",
+			"citation": "src/lib/data/store.svelte.ts:24-33"
+		},
+		"down_one": { "condition": "Relax strict mode in tsconfig.", "citation": "tsconfig.json:11" }
+	},
+	"structural_evidence": {}
+}

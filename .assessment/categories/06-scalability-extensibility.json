@@ -1,0 +1,57 @@
+{
+	"category": "scalability_extensibility",
+	"rubric_version": "1.0.0",
+	"raw_score": 4,
+	"score": 4,
+	"cap_applied": false,
+	"cap_reason": null,
+	"weight_pct": 10,
+	"weighted": 8.0,
+	"confidence": "medium",
+	"confidence_reason": "Small surface area; extensibility judged from the seam patterns in the data/store/navigation modules rather than from observed growth over time.",
+	"evidence": [
+		{
+			"claim": "Adding a navigation destination is config-driven — a single array entry in navigation.ts, no edits to the shell components.",
+			"citation": "src/lib/config/navigation.ts:15-27"
+		},
+		{
+			"claim": "Each entity is added the same way (pure ops + a thin store method + a form component), so a new entity is an additive change against a stable pattern, not a god-file edit.",
+			"citation": "src/lib/data/store.svelte.ts:46-110"
+		},
+		{
+			"claim": "Scaling assumptions are explicitly documented and bounded in ADR-001 (single-key localStorage, ~5MB, single-user, no cross-tab sync) rather than left implicit.",
+			"citation": "decisions/001-srt-localstorage-schema.md:42-43"
+		},
+		{
+			"claim": "Filtering/derivation in the reports list uses straightforward in-memory array filters with no per-row nested re-fetch (no N+1 pattern), appropriate for the bounded dataset.",
+			"citation": "src/routes/(app)/reports/+page.svelte:20-28"
+		}
+	],
+	"strengths": [
+		{
+			"point": "Route group + data-driven sidebar means multiple engineers can add entities/pages in parallel with minimal merge surface.",
+			"citation": "src/routes/(app)/+layout.svelte:19-23"
+		},
+		{
+			"point": "The versioned persistence envelope gives a forward-compat hook for schema migration rather than a hard break on stale data.",
+			"citation": "src/lib/types.ts:54-56"
+		}
+	],
+	"risks": [
+		{
+			"point": "The single-key whole-blob write and in-memory array scans are deliberately MVP-scoped; they would not survive a real multi-user/backend requirement without the repository layer the plan intentionally omitted.",
+			"citation": "decisions/001-srt-localstorage-schema.md:39-41"
+		}
+	],
+	"score_movers": {
+		"up_one": {
+			"condition": "Introduce an explicit data-access seam (interface) behind the store so a Supabase backend could be swapped in without touching the operations or routes.",
+			"citation": "src/lib/data/store.svelte.ts:43-44"
+		},
+		"down_one": {
+			"condition": "Add a blocking or per-row nested fetch into a hot derived path in a route component.",
+			"citation": "src/routes/(app)/reports/+page.svelte:20"
+		}
+	},
+	"structural_evidence": {}
+}

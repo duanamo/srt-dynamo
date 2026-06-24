@@ -5,6 +5,40 @@ A frontend-only web app for tracking internal status reports across three entiti
 referential integrity. There is no backend: all data lives in the browser's `localStorage` and is
 seeded with sample data on first load.
 
+## Engineering audit
+
+> **Snapshot:** this audit scores the **one-shot implementation** (commit `6711bb3`) — after the upfront
+> plan + ADRs but before the lifecycle's review polish (extra tests, this README rewrite, CHANGELOG, doc
+> comments). Scored at that point for a fair one-shot comparison; the final lifecycle state scores higher.
+
+Standardized 9-category engineering-quality audit (codebase-audit rubric). Full report:
+[`.assessment/report.md`](.assessment/report.md).
+
+**Overall: 86 / 100 — _strong_foundation_** · confidence: medium
+
+| Category (weight)                   | Score |
+| ----------------------------------- | :---: |
+| 01 Architectural coherence (15)     |  5/5  |
+| 02 Implementation quality (15)      |  5/5  |
+| 03 Operational readiness (15)       |  4/5  |
+| 04 Type safety & contracts (10)     |  4/5  |
+| 05 Test strategy (10)               |  3/5  |
+| 06 Scalability & extensibility (10) |  4/5  |
+| 07 Security & failure handling (10) |  4/5  |
+| 08 Engineering discipline (10)      |  5/5  |
+| 09 Technical debt & risk (5)        |  4/5  |
+
+**Strengths:** pure/reactive architectural split (side-effect-free `operations.ts` isolated from the
+`$state`/localStorage shell, so domain rules are unit-testable in node); an unusually complete
+engineering-discipline trail for an MVP (committed Plan Artifact + recorded plan-auditor verdict, two
+cross-linked ADRs, conventional issue-referenced commits, husky + lint-staged + Dependabot); clean deploy
+path and secret hygiene.
+
+**Risks:** tests not wired into CI; README/code drift (expected at this pre-polish snapshot — fixed later
+in the lifecycle); no observability surface (frontend-only).
+
+Verification at audit time: `check` ✓ · `lint` ✓ · `test` ✓ (33 tests).
+
 This started from Dynamo's internal-webapp template; the template's Supabase auth shell and SSR wiring
 were removed for this MVP (it needs no auth, backend, or database). The deployment infra under `infra/`
 ships with the template and is unused by this app.

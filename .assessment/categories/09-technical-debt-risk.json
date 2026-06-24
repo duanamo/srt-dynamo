@@ -1,0 +1,62 @@
+{
+	"category": "technical_debt_risk",
+	"rubric_version": "1.0.0",
+	"raw_score": 4,
+	"score": 4,
+	"cap_applied": false,
+	"cap_reason": null,
+	"weight_pct": 5,
+	"weighted": 4.0,
+	"confidence": "high",
+	"confidence_reason": null,
+	"evidence": [
+		{
+			"claim": "Zero TODO/FIXME/HACK/XXX markers in the application source (excluding vendored ui/).",
+			"citation": "structural:zero-todo-density"
+		},
+		{
+			"claim": "Known fragility is declared up front rather than hidden: ADR-001 spells out the brittle assumptions (single-key blob rewrite, no cross-tab sync, ~5MB synchronous limit) as accepted consequences.",
+			"citation": "decisions/001-srt-localstorage-schema.md:42-43"
+		},
+		{
+			"claim": "No competing patterns: a single CRUD/persistence pattern is used uniformly across the three entities, so there is no architectural drift to reconcile.",
+			"citation": "src/lib/data/operations.ts:103-181"
+		}
+	],
+	"strengths": [
+		{
+			"point": "Debt is tracked as ADR consequences with explicit rationale, so the next engineer inherits the tradeoffs rather than discovering them.",
+			"citation": "decisions/002-srt-referential-integrity.md:46-50"
+		},
+		{
+			"point": "Clean, conventional commit history with no scaffolding cruft left behind (the unused Supabase auth shell was explicitly torn out, not left dormant).",
+			"citation": "structural:zero-todo-density"
+		}
+	],
+	"risks": [
+		{
+			"point": "The chief residual risk is README/code drift (auth + styleguide sections describe removed code), which can mislead a future contributor about what the app actually is.",
+			"citation": "README.md:146-153"
+		},
+		{
+			"point": "database.types.ts and the gen:types script remain from the backend-capable template though the app is frontend-only; harmless stubs now but latent confusion if the backend is never wired.",
+			"citation": "src/lib/database.types.ts:1"
+		}
+	],
+	"score_movers": {
+		"up_one": {
+			"condition": "Reconcile the README with the frontend-only end state and record the localStorage-scale limits in a KNOWN-ISSUES.md so the declared debt has a home.",
+			"citation": "README.md:119"
+		},
+		"down_one": {
+			"condition": "Introduce untracked TODO/FIXME markers in the domain hot paths.",
+			"citation": "src/lib/data/operations.ts:142"
+		}
+	},
+	"structural_evidence": {
+		"zero-todo-density": {
+			"claim": "A grep for TODO/FIXME/HACK/XXX across application source (excluding vendored ui/) returns zero matches.",
+			"basis": ["command:grep-todos#exit=1"]
+		}
+	}
+}

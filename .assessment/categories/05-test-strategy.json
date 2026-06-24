@@ -1,0 +1,70 @@
+{
+	"category": "test_strategy",
+	"rubric_version": "1.0.0",
+	"raw_score": 3,
+	"score": 3,
+	"cap_applied": false,
+	"cap_reason": null,
+	"weight_pct": 10,
+	"weighted": 6.0,
+	"confidence": "high",
+	"confidence_reason": null,
+	"evidence": [
+		{
+			"claim": "Vitest is configured and the full suite runs green: 33 tests across 4 files.",
+			"citation": "command:npm-test#exit=0"
+		},
+		{
+			"claim": "Tests assert behavior, not just shape: immutability of CRUD ops, referential integrity blocking both ways, and timestamp create/edit semantics.",
+			"citation": "src/lib/data/operations.test.ts:83-123"
+		},
+		{
+			"claim": "A meaningful edge case is covered explicitly — 'reports this period' counts by reportingPeriod (subject month) not createdAt — matching the documented business rule.",
+			"citation": "src/lib/data/operations.test.ts:182-199"
+		},
+		{
+			"claim": "The seed dataset is tested as a contract (all roles present, one project per status, both deletable and blocked cases demonstrable, referential validity).",
+			"citation": "src/lib/data/seed.test.ts:33-48"
+		}
+	],
+	"strengths": [
+		{
+			"point": "Validation logic has positive and negative cases per entity, including malformed email and out-of-range reporting periods.",
+			"citation": "src/lib/validation.test.ts:66-100"
+		},
+		{
+			"point": "The pure/reactive architectural split makes the critical domain rules unit-testable in node without a DOM, and they are tested thoroughly.",
+			"citation": "src/lib/data/operations.test.ts:1-15"
+		}
+	],
+	"risks": [
+		{
+			"point": "Coverage stops at the pure layer: no component, route, or e2e tests for the Svelte UI, the store's localStorage persistence, or the delete-confirmation flows.",
+			"citation": "structural:tests-cover-pure-layer-only"
+		},
+		{
+			"point": "The test suite is not wired into CI — ci.yml runs check+build and deploy-prod runs check, but neither runs npm test, so a broken test would not block a merge or deploy.",
+			"citation": ".github/workflows/ci.yml:20-26"
+		}
+	],
+	"score_movers": {
+		"up_one": {
+			"condition": "Add the existing test suite to the CI workflow and add at least a few component/integration tests for the store persistence and form flows.",
+			"citation": ".github/workflows/ci.yml:21"
+		},
+		"down_one": {
+			"condition": "Remove the vitest config and the domain unit tests, dropping below any meaningful coverage.",
+			"citation": "vite.config.ts:7-9"
+		}
+	},
+	"structural_evidence": {
+		"tests-cover-pure-layer-only": {
+			"claim": "All four test files target the pure $lib modules (operations, seed, validation, utils); no .svelte, route, or store-persistence tests exist.",
+			"basis": [
+				"src/lib/data/operations.test.ts:1-15",
+				"src/lib/validation.test.ts:1-3",
+				"command:find-tests#exit=0"
+			]
+		}
+	}
+}

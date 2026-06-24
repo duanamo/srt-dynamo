@@ -1,0 +1,7 @@
+{
+	"classification": "software_repo",
+	"declared_maturity": "template",
+	"maturity_basis": "README.md:1",
+	"reason": "package.json with dependencies; src/ has 3+ source files; README has run instruction: 'npm ci'; Dockerfile present",
+	"target": "/private/tmp/dynamo-oneshot"
+}

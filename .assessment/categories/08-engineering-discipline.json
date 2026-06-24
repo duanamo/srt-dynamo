@@ -1,0 +1,74 @@
+{
+	"category": "engineering_discipline",
+	"rubric_version": "1.0.0",
+	"raw_score": 5,
+	"score": 5,
+	"cap_applied": false,
+	"cap_reason": null,
+	"weight_pct": 10,
+	"weighted": 10.0,
+	"confidence": "high",
+	"confidence_reason": null,
+	"evidence": [
+		{
+			"claim": "Lint and format are configured (eslint flat config + prettier) and enforced both in CI (via check) and pre-commit via husky + lint-staged on staged files.",
+			"citation": ".husky/pre-commit:1-18"
+		},
+		{
+			"claim": "The repo carries two cross-linked ADRs with a decisions index, documenting the persistence contract and the referential-integrity rule before implementation.",
+			"citation": "decisions/README.md:1-9"
+		},
+		{
+			"claim": "A committed Plan Artifact records the implementation plan, the Reuse & Prior Art check, and the pre-implementation plan-auditor verdict (Proceed after minor edits).",
+			"citation": "plans/9-status-report-tracker-mvp.md:130-154"
+		},
+		{
+			"claim": "Commit history is conventional and intent-bearing, with issue references (feat/docs/chore, '#9'), reflecting a tracked lifecycle rather than dump commits.",
+			"citation": "structural:conventional-commit-style"
+		},
+		{
+			"claim": "Dependency hygiene is automated: dependabot groups npm + github-actions updates weekly against the dev branch.",
+			"citation": ".github/dependabot.yml:1-12"
+		}
+	],
+	"strengths": [
+		{
+			"point": "The full Dynamo lifecycle is evidenced in-repo: plan + plan-audit + ADRs + conventional commits + .dynamo.json bindings, an unusually complete discipline trail for an MVP.",
+			"citation": "plans/9-status-report-tracker-mvp.md:1-18"
+		},
+		{
+			"point": "eslint config documents WHY each project-wide rule override exists (config-driven navigation, vendored ui/ ignore), so the lint posture is intentional and explained.",
+			"citation": "eslint.config.js:24-45"
+		}
+	],
+	"risks": [
+		{
+			"point": "README has drifted from the working tree: its Project Structure and Auth Architecture sections describe hooks.server.ts, login/, auth/callback/, and a /styleguide route that no longer exist after the auth shell was removed.",
+			"citation": "README.md:119-153"
+		},
+		{
+			"point": "No CHANGELOG.md or KNOWN-ISSUES.md present, though acceptable for a pre-release template with no tagged versions.",
+			"citation": "structural:no-changelog"
+		}
+	],
+	"score_movers": {
+		"up_one": {
+			"condition": "Already at ceiling: ADRs + plan + lint-in-CI + automated dep updates + usable commit history all present.",
+			"citation": "plans/9-status-report-tracker-mvp.md:130-131"
+		},
+		"down_one": {
+			"condition": "Stop enforcing format/lint in the pre-commit chain or remove the ADRs/plan trail.",
+			"citation": ".husky/pre-commit:13"
+		}
+	},
+	"structural_evidence": {
+		"conventional-commit-style": {
+			"claim": "Recent commits follow the Dynamo conventional-commit taxonomy (feat/docs/chore) with issue references and meaningful subjects; no wip/misc dump commits.",
+			"basis": ["command:git-log-sample#exit=0"]
+		},
+		"no-changelog": {
+			"claim": "No CHANGELOG.md or KNOWN-ISSUES.md exists at the repo root in this snapshot.",
+			"basis": ["command:ls-root#exit=0"]
+		}
+	}
+}

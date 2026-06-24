@@ -1,0 +1,749 @@
+{
+	"rubric_version": "1.0.0",
+	"target": "/private/tmp/dynamo-oneshot",
+	"timestamp_utc": "2026-06-24T17:13:07.642821+00:00",
+	"assessment_scope": "full_repo",
+	"partial": false,
+	"included_categories": ["01", "02", "03", "04", "05", "06", "07", "08", "09"],
+	"classification": {
+		"classification": "software_repo",
+		"declared_maturity": "template",
+		"maturity_basis": "README.md:1",
+		"reason": "package.json with dependencies; src/ has 3+ source files; README has run instruction: 'npm ci'; Dockerfile present",
+		"target": "/private/tmp/dynamo-oneshot"
+	},
+	"executive_summary": "Repository scores 86.0/100 — _strong_foundation_ band. Strongest: #01 Architectural coherence (5/5, weight 15%). Weakest: #05 Test strategy (3/5, weight 10%). Highest-leverage improvement: Add the existing test suite to the CI workflow and add at least a few component/integration tests for the store persistence and form flows..",
+	"repository_maturity": {
+		"stage": "mature_platform",
+		"confidence": "medium",
+		"rationale": [
+			"Overall score 86.0 maps to stage=mature_platform per aggregation rules.",
+			"Declared maturity: template (basis: README.md:1)."
+		]
+	},
+	"scores": {
+		"architectural_coherence": {
+			"category": "architectural_coherence",
+			"rubric_version": "1.0.0",
+			"raw_score": 5,
+			"score": 5,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 15,
+			"weighted": 15.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "Pure domain logic is isolated from reactivity/persistence: operations.ts holds immutable, side-effect-free functions over a plain AppData and never touches localStorage or $state.",
+					"citation": "src/lib/data/operations.ts:1-19"
+				},
+				{
+					"claim": "The reactive shell wraps the pure operations and is the only layer that touches $state and localStorage, delegating every mutation to ops.* — a clean ports/adapters split.",
+					"citation": "src/lib/data/store.svelte.ts:43-110"
+				},
+				{
+					"claim": "Domain types are centralized in one source-of-truth module imported across store, validation, seed, and components; no parallel type definitions.",
+					"citation": "src/lib/types.ts:1-68"
+				},
+				{
+					"claim": "Layering is enforced by direction: operations/seed/validation depend only on $lib/types; the store depends on operations+seed; routes depend on the store — no upward or cross-layer reach observed.",
+					"citation": "structural:no-cross-layer-imports"
+				},
+				{
+					"claim": "Architectural decisions are recorded as ADRs that the code references directly, so a reader can map the storage contract and integrity rule in one pass.",
+					"citation": "decisions/001-srt-localstorage-schema.md:1-44"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Pure/reactive split makes the business rules testable in node without jsdom and keeps framework code out of the domain layer.",
+					"citation": "src/lib/data/operations.ts:1-6"
+				},
+				{
+					"point": "Two accepted ADRs document the load-bearing contracts (persistence envelope, referential-integrity rule) and are cross-linked from the index and the code.",
+					"citation": "decisions/002-srt-referential-integrity.md:1-50"
+				}
+			],
+			"risks": [
+				{
+					"point": "Data access is direct array scans inside operations rather than a repository abstraction; acceptable at MVP scale but a single point that would need rework if a backend is added.",
+					"citation": "src/lib/data/operations.ts:21-31"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Already at ceiling: boundaries + enforced dep direction + ADRs + clear ownership all present.",
+					"citation": "decisions/README.md:1-9"
+				},
+				"down_one": {
+					"condition": "Introduce a localStorage/$state access inside operations.ts, collapsing the pure/reactive boundary.",
+					"citation": "src/lib/data/operations.ts:1-5"
+				}
+			},
+			"structural_evidence": {
+				"no-cross-layer-imports": {
+					"claim": "The pure domain layer (operations/seed/validation) imports only from $lib/types; the reactive store imports operations+seed; routes import the store — dependency direction points inward with no cross-layer reach.",
+					"basis": [
+						"src/lib/data/operations.ts:7-16",
+						"src/lib/data/store.svelte.ts:6-10",
+						"src/lib/validation.ts:4-13"
+					]
+				}
+			}
+		},
+		"implementation_quality": {
+			"category": "implementation_quality",
+			"rubric_version": "1.0.0",
+			"raw_score": 5,
+			"score": 5,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 15,
+			"weighted": 15.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "Type-check (svelte-check over 4864 files) passes with 0 errors and 0 warnings.",
+					"citation": "command:npm-check#exit=0"
+				},
+				{
+					"claim": "Lint (prettier --check + eslint) passes clean on the working tree.",
+					"citation": "command:npm-lint#exit=0"
+				},
+				{
+					"claim": "Functions are short, single-purpose, and read in isolation: each CRUD op is an immutable transform returning a new AppData with intent-carrying names (createUser, canDeleteUser, deleteReport).",
+					"citation": "src/lib/data/operations.ts:65-101"
+				},
+				{
+					"claim": "Comments explain WHY (why time is injected, why reports are always deletable, why the period is matched against reportingPeriod not createdAt) rather than restating code.",
+					"citation": "src/lib/data/operations.ts:48-61"
+				},
+				{
+					"claim": "Naming and form patterns are consistent across the route group and form components (Field/SelectField wrappers, derived validation, submitted-gated error display).",
+					"citation": "src/lib/components/forms/ReportForm.svelte:39-56"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Domain operations are immutable and pure, so local reasoning is easy and every function fits on a screen.",
+					"citation": "src/lib/data/operations.ts:105-123"
+				},
+				{
+					"point": "Human-readable deletion-failure messages are assembled with correct pluralization, showing care at the edges.",
+					"citation": "src/lib/data/operations.ts:86-94"
+				}
+			],
+			"risks": [
+				{
+					"point": "ReportForm relies on a state_referenced_locally suppression to seed form fields once from the prop; correct here but a pattern that can surprise a reader unfamiliar with the rune.",
+					"citation": "src/lib/components/forms/ReportForm.svelte:26-27"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Already at ceiling: clean typecheck+lint, intentional abstraction, low duplication, WHY-comments throughout.",
+					"citation": "command:npm-check#exit=0"
+				},
+				"down_one": {
+					"condition": "Introduce significant duplication of the CRUD transform logic into the route components instead of delegating to operations.ts.",
+					"citation": "src/lib/data/store.svelte.ts:46-67"
+				}
+			},
+			"structural_evidence": {}
+		},
+		"operational_readiness": {
+			"category": "operational_readiness",
+			"rubric_version": "1.0.0",
+			"raw_score": 4,
+			"score": 4,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 15,
+			"weighted": 12.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "Multi-stage Dockerfile builds the SvelteKit app and runs the adapter-node server, exposing port 3000.",
+					"citation": "Dockerfile:1-15"
+				},
+				{
+					"claim": "CI runs on push/PR to dev and main, doing npm ci + type-check + build with build-time env stubs.",
+					"citation": ".github/workflows/ci.yml:1-34"
+				},
+				{
+					"claim": "Production deploy workflow gates on npm run check, builds+pushes a GHCR image, copies infra, and writes the env file from GitHub Secrets over SSH.",
+					"citation": ".github/workflows/deploy-prod.yml:10-77"
+				},
+				{
+					"claim": "Env contract is documented as reference-only with secrets sourced from 1Password at runtime, not committed; dev/prod separation via DEV_/PROD_ prefixed secrets.",
+					"citation": ".env.example:1-16"
+				},
+				{
+					"claim": "Reverse proxy with automatic TLS (Caddy) is defined for both dev and prod hosts in the production compose stack.",
+					"citation": "infra/docker-compose.prod.yml:1-27"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Full push-button deploy path: CI check gate, image build, infra copy, and SSH-driven compose up — dev and prod separated.",
+					"citation": ".github/workflows/deploy-prod.yml:61-77"
+				},
+				{
+					"point": "Secrets are kept entirely out of the repo (1Password locally, GitHub Secrets in CI), with .env.example serving only as a manifest.",
+					"citation": ".env.example:1-7"
+				}
+			],
+			"risks": [
+				{
+					"point": "No application logging, metrics, or HTTP health/readiness endpoint — the frontend-only build has ssr=false so there is no server-side observability surface.",
+					"citation": "structural:no-health-endpoint"
+				},
+				{
+					"point": "Production compose images still carry the placeholder YOUR_APP_NAME tag that the README requires hand-editing before first deploy.",
+					"citation": "infra/docker-compose.prod.yml:14-21"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Add a health/readiness endpoint and structured logging plus startup env validation to reach push-button + observable.",
+					"citation": "src/routes/+layout.ts:1"
+				},
+				"down_one": {
+					"condition": "Break the CI check gate or remove the .env contract so the deploy path is no longer reproducible.",
+					"citation": ".github/workflows/ci.yml:22"
+				}
+			},
+			"structural_evidence": {
+				"no-health-endpoint": {
+					"claim": "No HTTP health/readiness endpoint or server logging exists; the app is client-rendered (ssr=false) with no +server.ts routes.",
+					"basis": ["src/routes/+page.ts:1-7", "command:find-server-routes#exit=0"]
+				}
+			}
+		},
+		"type_safety_contracts": {
+			"category": "type_safety_contracts",
+			"rubric_version": "1.0.0",
+			"raw_score": 4,
+			"score": 4,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 10,
+			"weighted": 8.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "TypeScript strict mode is enabled in the primary tsconfig, with checkJs on as well.",
+					"citation": "tsconfig.json:3-12"
+				},
+				{
+					"claim": "svelte-check passes with 0 errors across the project, confirming the strict config is satisfied.",
+					"citation": "command:npm-check#exit=0"
+				},
+				{
+					"claim": "Domain types use const-tuple enums with derived union types and Omit-based input types, giving precise compile-time contracts (Role/ProjectStatus/OverallStatus, UserInput/ReportInput).",
+					"citation": "src/lib/types.ts:6-62"
+				},
+				{
+					"claim": "All external/untrusted input (form payloads, the persisted localStorage blob) is runtime-validated: validation.ts checks every field and load() verifies the parsed envelope shape and version before trusting it.",
+					"citation": "src/lib/data/store.svelte.ts:20-41"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Runtime validation guards every boundary: form input via validateUser/Project/Report and the persisted blob via a shape+version check on hydrate.",
+					"citation": "src/lib/validation.ts:22-56"
+				},
+				{
+					"point": "Deletion guards return a discriminated-union result ({ok:true}|{ok:false,reason}) instead of throwing, making the contract explicit at the type level.",
+					"citation": "src/lib/types.ts:67-68"
+				}
+			],
+			"risks": [
+				{
+					"point": "The only explicit any usage is in the shadcn-style utility generics in utils.ts; it is suppressed via eslint-disable and confined to component-prop helpers, not domain code.",
+					"citation": "src/lib/utils.ts:8-12"
+				},
+				{
+					"point": "Validation is hand-rolled regex/field checks rather than a schema library (Zod); adequate here but no generated/shared contract artifact.",
+					"citation": "src/lib/validation.ts:15-16"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Adopt a schema validator (e.g. Zod) shared between form validation and the localStorage hydrate path to give one declarative contract with inferred types.",
+					"citation": "src/lib/data/store.svelte.ts:24-33"
+				},
+				"down_one": {
+					"condition": "Relax strict mode in tsconfig.",
+					"citation": "tsconfig.json:11"
+				}
+			},
+			"structural_evidence": {}
+		},
+		"test_strategy": {
+			"category": "test_strategy",
+			"rubric_version": "1.0.0",
+			"raw_score": 3,
+			"score": 3,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 10,
+			"weighted": 6.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "Vitest is configured and the full suite runs green: 33 tests across 4 files.",
+					"citation": "command:npm-test#exit=0"
+				},
+				{
+					"claim": "Tests assert behavior, not just shape: immutability of CRUD ops, referential integrity blocking both ways, and timestamp create/edit semantics.",
+					"citation": "src/lib/data/operations.test.ts:83-123"
+				},
+				{
+					"claim": "A meaningful edge case is covered explicitly — 'reports this period' counts by reportingPeriod (subject month) not createdAt — matching the documented business rule.",
+					"citation": "src/lib/data/operations.test.ts:182-199"
+				},
+				{
+					"claim": "The seed dataset is tested as a contract (all roles present, one project per status, both deletable and blocked cases demonstrable, referential validity).",
+					"citation": "src/lib/data/seed.test.ts:33-48"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Validation logic has positive and negative cases per entity, including malformed email and out-of-range reporting periods.",
+					"citation": "src/lib/validation.test.ts:66-100"
+				},
+				{
+					"point": "The pure/reactive architectural split makes the critical domain rules unit-testable in node without a DOM, and they are tested thoroughly.",
+					"citation": "src/lib/data/operations.test.ts:1-15"
+				}
+			],
+			"risks": [
+				{
+					"point": "Coverage stops at the pure layer: no component, route, or e2e tests for the Svelte UI, the store's localStorage persistence, or the delete-confirmation flows.",
+					"citation": "structural:tests-cover-pure-layer-only"
+				},
+				{
+					"point": "The test suite is not wired into CI — ci.yml runs check+build and deploy-prod runs check, but neither runs npm test, so a broken test would not block a merge or deploy.",
+					"citation": ".github/workflows/ci.yml:20-26"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Add the existing test suite to the CI workflow and add at least a few component/integration tests for the store persistence and form flows.",
+					"citation": ".github/workflows/ci.yml:21"
+				},
+				"down_one": {
+					"condition": "Remove the vitest config and the domain unit tests, dropping below any meaningful coverage.",
+					"citation": "vite.config.ts:7-9"
+				}
+			},
+			"structural_evidence": {
+				"tests-cover-pure-layer-only": {
+					"claim": "All four test files target the pure $lib modules (operations, seed, validation, utils); no .svelte, route, or store-persistence tests exist.",
+					"basis": [
+						"src/lib/data/operations.test.ts:1-15",
+						"src/lib/validation.test.ts:1-3",
+						"command:find-tests#exit=0"
+					]
+				}
+			}
+		},
+		"scalability_extensibility": {
+			"category": "scalability_extensibility",
+			"rubric_version": "1.0.0",
+			"raw_score": 4,
+			"score": 4,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 10,
+			"weighted": 8.0,
+			"confidence": "medium",
+			"confidence_reason": "Small surface area; extensibility judged from the seam patterns in the data/store/navigation modules rather than from observed growth over time.",
+			"evidence": [
+				{
+					"claim": "Adding a navigation destination is config-driven — a single array entry in navigation.ts, no edits to the shell components.",
+					"citation": "src/lib/config/navigation.ts:15-27"
+				},
+				{
+					"claim": "Each entity is added the same way (pure ops + a thin store method + a form component), so a new entity is an additive change against a stable pattern, not a god-file edit.",
+					"citation": "src/lib/data/store.svelte.ts:46-110"
+				},
+				{
+					"claim": "Scaling assumptions are explicitly documented and bounded in ADR-001 (single-key localStorage, ~5MB, single-user, no cross-tab sync) rather than left implicit.",
+					"citation": "decisions/001-srt-localstorage-schema.md:42-43"
+				},
+				{
+					"claim": "Filtering/derivation in the reports list uses straightforward in-memory array filters with no per-row nested re-fetch (no N+1 pattern), appropriate for the bounded dataset.",
+					"citation": "src/routes/(app)/reports/+page.svelte:20-28"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Route group + data-driven sidebar means multiple engineers can add entities/pages in parallel with minimal merge surface.",
+					"citation": "src/routes/(app)/+layout.svelte:19-23"
+				},
+				{
+					"point": "The versioned persistence envelope gives a forward-compat hook for schema migration rather than a hard break on stale data.",
+					"citation": "src/lib/types.ts:54-56"
+				}
+			],
+			"risks": [
+				{
+					"point": "The single-key whole-blob write and in-memory array scans are deliberately MVP-scoped; they would not survive a real multi-user/backend requirement without the repository layer the plan intentionally omitted.",
+					"citation": "decisions/001-srt-localstorage-schema.md:39-41"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Introduce an explicit data-access seam (interface) behind the store so a Supabase backend could be swapped in without touching the operations or routes.",
+					"citation": "src/lib/data/store.svelte.ts:43-44"
+				},
+				"down_one": {
+					"condition": "Add a blocking or per-row nested fetch into a hot derived path in a route component.",
+					"citation": "src/routes/(app)/reports/+page.svelte:20"
+				}
+			},
+			"structural_evidence": {}
+		},
+		"security_failure_handling": {
+			"category": "security_failure_handling",
+			"rubric_version": "1.0.0",
+			"raw_score": 4,
+			"score": 4,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 10,
+			"weighted": 8.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "No secrets in source: a grep for AWS/GitHub/Stripe keys, PEM blocks, and inline api-key assignments across src and .env.example returns nothing; .env.example holds placeholders only and routes secrets to 1Password/GitHub Secrets.",
+					"citation": "structural:secrets-in-env-only"
+				},
+				{
+					"claim": "No unsafe execution: no eval, new Function, innerHTML, or {@html} anywhere in the application source.",
+					"citation": "structural:no-unsafe-exec"
+				},
+				{
+					"claim": "All user input is validated before it enters the dataset, and the persisted blob is shape/version-checked on read with a try/catch that re-seeds on corrupt data rather than crashing.",
+					"citation": "src/lib/data/store.svelte.ts:20-41"
+				},
+				{
+					"claim": "Failure handling is explicit, not swallowed: deletion guards return a typed {ok:false, reason} that the UI surfaces, rather than throwing or silently dropping the operation.",
+					"citation": "src/lib/data/operations.ts:81-95"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Trust surface is minimal by design — frontend-only, no network calls, no server input parsing — and every boundary that does exist (form input, localStorage) is validated.",
+					"citation": "src/lib/validation.ts:41-56"
+				},
+				{
+					"point": "The corrupt-payload path degrades gracefully (catch -> re-seed) instead of leaving the app in a broken state.",
+					"citation": "src/lib/data/store.svelte.ts:35-40"
+				}
+			],
+			"risks": [
+				{
+					"point": "Persisted data is read back as Partial<AppData> and cast to AppData after an array-presence check; element-level shape is not deep-validated, so a hand-edited localStorage blob could carry malformed records.",
+					"citation": "src/lib/data/store.svelte.ts:25-33"
+				},
+				{
+					"point": "No SAST/dependency-audit step or threat-model doc in CI; for a frontend-only internal tool the residual risk is low, but it is absent.",
+					"citation": ".github/workflows/ci.yml:9-26"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Add a dependency-audit/SAST step to CI and deep-validate each persisted record (not just array presence) on hydrate.",
+					"citation": "src/lib/data/store.svelte.ts:26-33"
+				},
+				"down_one": {
+					"condition": "Introduce {@html} or innerHTML rendering of user-supplied report text without sanitization.",
+					"citation": "src/routes/(app)/reports/+page.svelte:119"
+				}
+			},
+			"structural_evidence": {
+				"secrets-in-env-only": {
+					"claim": "No hardcoded credentials in tracked source; secrets are referenced via env/1Password/GitHub Secrets and .env.example contains placeholders only.",
+					"basis": [".env.example:1-16", "command:grep-secrets#exit=1"]
+				},
+				"no-unsafe-exec": {
+					"claim": "No eval, new Function, innerHTML, or {@html} sinks exist in the application source.",
+					"basis": ["command:grep-unsafe-exec#exit=1"]
+				}
+			}
+		},
+		"engineering_discipline": {
+			"category": "engineering_discipline",
+			"rubric_version": "1.0.0",
+			"raw_score": 5,
+			"score": 5,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 10,
+			"weighted": 10.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "Lint and format are configured (eslint flat config + prettier) and enforced both in CI (via check) and pre-commit via husky + lint-staged on staged files.",
+					"citation": ".husky/pre-commit:1-18"
+				},
+				{
+					"claim": "The repo carries two cross-linked ADRs with a decisions index, documenting the persistence contract and the referential-integrity rule before implementation.",
+					"citation": "decisions/README.md:1-9"
+				},
+				{
+					"claim": "A committed Plan Artifact records the implementation plan, the Reuse & Prior Art check, and the pre-implementation plan-auditor verdict (Proceed after minor edits).",
+					"citation": "plans/9-status-report-tracker-mvp.md:130-154"
+				},
+				{
+					"claim": "Commit history is conventional and intent-bearing, with issue references (feat/docs/chore, '#9'), reflecting a tracked lifecycle rather than dump commits.",
+					"citation": "structural:conventional-commit-style"
+				},
+				{
+					"claim": "Dependency hygiene is automated: dependabot groups npm + github-actions updates weekly against the dev branch.",
+					"citation": ".github/dependabot.yml:1-12"
+				}
+			],
+			"strengths": [
+				{
+					"point": "The full Dynamo lifecycle is evidenced in-repo: plan + plan-audit + ADRs + conventional commits + .dynamo.json bindings, an unusually complete discipline trail for an MVP.",
+					"citation": "plans/9-status-report-tracker-mvp.md:1-18"
+				},
+				{
+					"point": "eslint config documents WHY each project-wide rule override exists (config-driven navigation, vendored ui/ ignore), so the lint posture is intentional and explained.",
+					"citation": "eslint.config.js:24-45"
+				}
+			],
+			"risks": [
+				{
+					"point": "README has drifted from the working tree: its Project Structure and Auth Architecture sections describe hooks.server.ts, login/, auth/callback/, and a /styleguide route that no longer exist after the auth shell was removed.",
+					"citation": "README.md:119-153"
+				},
+				{
+					"point": "No CHANGELOG.md or KNOWN-ISSUES.md present, though acceptable for a pre-release template with no tagged versions.",
+					"citation": "structural:no-changelog"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Already at ceiling: ADRs + plan + lint-in-CI + automated dep updates + usable commit history all present.",
+					"citation": "plans/9-status-report-tracker-mvp.md:130-131"
+				},
+				"down_one": {
+					"condition": "Stop enforcing format/lint in the pre-commit chain or remove the ADRs/plan trail.",
+					"citation": ".husky/pre-commit:13"
+				}
+			},
+			"structural_evidence": {
+				"conventional-commit-style": {
+					"claim": "Recent commits follow the Dynamo conventional-commit taxonomy (feat/docs/chore) with issue references and meaningful subjects; no wip/misc dump commits.",
+					"basis": ["command:git-log-sample#exit=0"]
+				},
+				"no-changelog": {
+					"claim": "No CHANGELOG.md or KNOWN-ISSUES.md exists at the repo root in this snapshot.",
+					"basis": ["command:ls-root#exit=0"]
+				}
+			}
+		},
+		"technical_debt_risk": {
+			"category": "technical_debt_risk",
+			"rubric_version": "1.0.0",
+			"raw_score": 4,
+			"score": 4,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 5,
+			"weighted": 4.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "Zero TODO/FIXME/HACK/XXX markers in the application source (excluding vendored ui/).",
+					"citation": "structural:zero-todo-density"
+				},
+				{
+					"claim": "Known fragility is declared up front rather than hidden: ADR-001 spells out the brittle assumptions (single-key blob rewrite, no cross-tab sync, ~5MB synchronous limit) as accepted consequences.",
+					"citation": "decisions/001-srt-localstorage-schema.md:42-43"
+				},
+				{
+					"claim": "No competing patterns: a single CRUD/persistence pattern is used uniformly across the three entities, so there is no architectural drift to reconcile.",
+					"citation": "src/lib/data/operations.ts:103-181"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Debt is tracked as ADR consequences with explicit rationale, so the next engineer inherits the tradeoffs rather than discovering them.",
+					"citation": "decisions/002-srt-referential-integrity.md:46-50"
+				},
+				{
+					"point": "Clean, conventional commit history with no scaffolding cruft left behind (the unused Supabase auth shell was explicitly torn out, not left dormant).",
+					"citation": "structural:zero-todo-density"
+				}
+			],
+			"risks": [
+				{
+					"point": "The chief residual risk is README/code drift (auth + styleguide sections describe removed code), which can mislead a future contributor about what the app actually is.",
+					"citation": "README.md:146-153"
+				},
+				{
+					"point": "database.types.ts and the gen:types script remain from the backend-capable template though the app is frontend-only; harmless stubs now but latent confusion if the backend is never wired.",
+					"citation": "src/lib/database.types.ts:1"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Reconcile the README with the frontend-only end state and record the localStorage-scale limits in a KNOWN-ISSUES.md so the declared debt has a home.",
+					"citation": "README.md:119"
+				},
+				"down_one": {
+					"condition": "Introduce untracked TODO/FIXME markers in the domain hot paths.",
+					"citation": "src/lib/data/operations.ts:142"
+				}
+			},
+			"structural_evidence": {
+				"zero-todo-density": {
+					"claim": "A grep for TODO/FIXME/HACK/XXX across application source (excluding vendored ui/) returns zero matches.",
+					"basis": ["command:grep-todos#exit=1"]
+				}
+			}
+		}
+	},
+	"overall_score": 86.0,
+	"weighted_sum_partial": null,
+	"band": "strong_foundation",
+	"top_strengths": [
+		{
+			"point": "Pure/reactive split makes the business rules testable in node without jsdom and keeps framework code out of the domain layer.",
+			"citation": "src/lib/data/operations.ts:1-6",
+			"category": "architectural_coherence"
+		},
+		{
+			"point": "Domain operations are immutable and pure, so local reasoning is easy and every function fits on a screen.",
+			"citation": "src/lib/data/operations.ts:105-123",
+			"category": "implementation_quality"
+		},
+		{
+			"point": "Full push-button deploy path: CI check gate, image build, infra copy, and SSH-driven compose up — dev and prod separated.",
+			"citation": ".github/workflows/deploy-prod.yml:61-77",
+			"category": "operational_readiness"
+		},
+		{
+			"point": "The full Dynamo lifecycle is evidenced in-repo: plan + plan-audit + ADRs + conventional commits + .dynamo.json bindings, an unusually complete discipline trail for an MVP.",
+			"citation": "plans/9-status-report-tracker-mvp.md:1-18",
+			"category": "engineering_discipline"
+		},
+		{
+			"point": "Runtime validation guards every boundary: form input via validateUser/Project/Report and the persisted blob via a shape+version check on hydrate.",
+			"citation": "src/lib/validation.ts:22-56",
+			"category": "type_safety_contracts"
+		}
+	],
+	"top_risks": [
+		{
+			"point": "Coverage stops at the pure layer: no component, route, or e2e tests for the Svelte UI, the store's localStorage persistence, or the delete-confirmation flows.",
+			"citation": "structural:tests-cover-pure-layer-only",
+			"category": "test_strategy"
+		},
+		{
+			"point": "No application logging, metrics, or HTTP health/readiness endpoint — the frontend-only build has ssr=false so there is no server-side observability surface.",
+			"citation": "structural:no-health-endpoint",
+			"category": "operational_readiness"
+		},
+		{
+			"point": "The only explicit any usage is in the shadcn-style utility generics in utils.ts; it is suppressed via eslint-disable and confined to component-prop helpers, not domain code.",
+			"citation": "src/lib/utils.ts:8-12",
+			"category": "type_safety_contracts"
+		},
+		{
+			"point": "The single-key whole-blob write and in-memory array scans are deliberately MVP-scoped; they would not survive a real multi-user/backend requirement without the repository layer the plan intentionally omitted.",
+			"citation": "decisions/001-srt-localstorage-schema.md:39-41",
+			"category": "scalability_extensibility"
+		},
+		{
+			"point": "Persisted data is read back as Partial<AppData> and cast to AppData after an array-presence check; element-level shape is not deep-validated, so a hand-edited localStorage blob could carry malformed records.",
+			"citation": "src/lib/data/store.svelte.ts:25-33",
+			"category": "security_failure_handling"
+		}
+	],
+	"highest_leverage_improvements": [
+		{
+			"title": "Add the existing test suite to the CI workflow and add at least a few component/integration tests for the store persistence and form flows.",
+			"impact": "medium",
+			"effort": "medium",
+			"reasoning": "Test strategy scores 3/5 at weight 10% (leverage 4.0). Mover: .github/workflows/ci.yml:21.",
+			"category": "test_strategy",
+			"citation": ".github/workflows/ci.yml:21"
+		},
+		{
+			"title": "Add a health/readiness endpoint and structured logging plus startup env validation to reach push-button + observable.",
+			"impact": "medium",
+			"effort": "medium",
+			"reasoning": "Operational readiness scores 4/5 at weight 15% (leverage 3.0). Mover: src/routes/+layout.ts:1.",
+			"category": "operational_readiness",
+			"citation": "src/routes/+layout.ts:1"
+		},
+		{
+			"title": "Adopt a schema validator (e.g. Zod) shared between form validation and the localStorage hydrate path to give one declarative contract with inferred types.",
+			"impact": "low",
+			"effort": "medium",
+			"reasoning": "Type safety & contracts scores 4/5 at weight 10% (leverage 2.0). Mover: src/lib/data/store.svelte.ts:24-33.",
+			"category": "type_safety_contracts",
+			"citation": "src/lib/data/store.svelte.ts:24-33"
+		},
+		{
+			"title": "Introduce an explicit data-access seam (interface) behind the store so a Supabase backend could be swapped in without touching the operations or routes.",
+			"impact": "low",
+			"effort": "medium",
+			"reasoning": "Scalability & extensibility scores 4/5 at weight 10% (leverage 2.0). Mover: src/lib/data/store.svelte.ts:43-44.",
+			"category": "scalability_extensibility",
+			"citation": "src/lib/data/store.svelte.ts:43-44"
+		},
+		{
+			"title": "Add a dependency-audit/SAST step to CI and deep-validate each persisted record (not just array presence) on hydrate.",
+			"impact": "low",
+			"effort": "medium",
+			"reasoning": "Security & failure handling scores 4/5 at weight 10% (leverage 2.0). Mover: src/lib/data/store.svelte.ts:26-33.",
+			"category": "security_failure_handling",
+			"citation": "src/lib/data/store.svelte.ts:26-33"
+		}
+	],
+	"production_readiness_assessment": "Production-ready across measured dimensions. No specific blockers identified.",
+	"recommended_next_steps": [
+		{
+			"priority": 1,
+			"action": "Add the existing test suite to the CI workflow and add at least a few component/integration tests for the store persistence and form flows.",
+			"reasoning": "Test strategy scores 3/5 at weight 10% (leverage 4.0). Mover: .github/workflows/ci.yml:21."
+		},
+		{
+			"priority": 2,
+			"action": "Add a health/readiness endpoint and structured logging plus startup env validation to reach push-button + observable.",
+			"reasoning": "Operational readiness scores 4/5 at weight 15% (leverage 3.0). Mover: src/routes/+layout.ts:1."
+		},
+		{
+			"priority": 3,
+			"action": "Adopt a schema validator (e.g. Zod) shared between form validation and the localStorage hydrate path to give one declarative contract with inferred types.",
+			"reasoning": "Type safety & contracts scores 4/5 at weight 10% (leverage 2.0). Mover: src/lib/data/store.svelte.ts:24-33."
+		},
+		{
+			"priority": 4,
+			"action": "Introduce an explicit data-access seam (interface) behind the store so a Supabase backend could be swapped in without touching the operations or routes.",
+			"reasoning": "Scalability & extensibility scores 4/5 at weight 10% (leverage 2.0). Mover: src/lib/data/store.svelte.ts:43-44."
+		},
+		{
+			"priority": 5,
+			"action": "Add a dependency-audit/SAST step to CI and deep-validate each persisted record (not just array presence) on hydrate.",
+			"reasoning": "Security & failure handling scores 4/5 at weight 10% (leverage 2.0). Mover: src/lib/data/store.svelte.ts:26-33."
+		}
+	],
+	"validation_errors": []
+}

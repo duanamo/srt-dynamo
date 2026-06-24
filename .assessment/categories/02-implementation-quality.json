@@ -1,0 +1,61 @@
+{
+	"category": "implementation_quality",
+	"rubric_version": "1.0.0",
+	"raw_score": 5,
+	"score": 5,
+	"cap_applied": false,
+	"cap_reason": null,
+	"weight_pct": 15,
+	"weighted": 15.0,
+	"confidence": "high",
+	"confidence_reason": null,
+	"evidence": [
+		{
+			"claim": "Type-check (svelte-check over 4864 files) passes with 0 errors and 0 warnings.",
+			"citation": "command:npm-check#exit=0"
+		},
+		{
+			"claim": "Lint (prettier --check + eslint) passes clean on the working tree.",
+			"citation": "command:npm-lint#exit=0"
+		},
+		{
+			"claim": "Functions are short, single-purpose, and read in isolation: each CRUD op is an immutable transform returning a new AppData with intent-carrying names (createUser, canDeleteUser, deleteReport).",
+			"citation": "src/lib/data/operations.ts:65-101"
+		},
+		{
+			"claim": "Comments explain WHY (why time is injected, why reports are always deletable, why the period is matched against reportingPeriod not createdAt) rather than restating code.",
+			"citation": "src/lib/data/operations.ts:48-61"
+		},
+		{
+			"claim": "Naming and form patterns are consistent across the route group and form components (Field/SelectField wrappers, derived validation, submitted-gated error display).",
+			"citation": "src/lib/components/forms/ReportForm.svelte:39-56"
+		}
+	],
+	"strengths": [
+		{
+			"point": "Domain operations are immutable and pure, so local reasoning is easy and every function fits on a screen.",
+			"citation": "src/lib/data/operations.ts:105-123"
+		},
+		{
+			"point": "Human-readable deletion-failure messages are assembled with correct pluralization, showing care at the edges.",
+			"citation": "src/lib/data/operations.ts:86-94"
+		}
+	],
+	"risks": [
+		{
+			"point": "ReportForm relies on a state_referenced_locally suppression to seed form fields once from the prop; correct here but a pattern that can surprise a reader unfamiliar with the rune.",
+			"citation": "src/lib/components/forms/ReportForm.svelte:26-27"
+		}
+	],
+	"score_movers": {
+		"up_one": {
+			"condition": "Already at ceiling: clean typecheck+lint, intentional abstraction, low duplication, WHY-comments throughout.",
+			"citation": "command:npm-check#exit=0"
+		},
+		"down_one": {
+			"condition": "Introduce significant duplication of the CRUD transform logic into the route components instead of delegating to operations.ts.",
+			"citation": "src/lib/data/store.svelte.ts:46-67"
+		}
+	},
+	"structural_evidence": {}
+}

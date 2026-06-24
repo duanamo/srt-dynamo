@@ -1,0 +1,70 @@
+{
+	"category": "operational_readiness",
+	"rubric_version": "1.0.0",
+	"raw_score": 4,
+	"score": 4,
+	"cap_applied": false,
+	"cap_reason": null,
+	"weight_pct": 15,
+	"weighted": 12.0,
+	"confidence": "high",
+	"confidence_reason": null,
+	"evidence": [
+		{
+			"claim": "Multi-stage Dockerfile builds the SvelteKit app and runs the adapter-node server, exposing port 3000.",
+			"citation": "Dockerfile:1-15"
+		},
+		{
+			"claim": "CI runs on push/PR to dev and main, doing npm ci + type-check + build with build-time env stubs.",
+			"citation": ".github/workflows/ci.yml:1-34"
+		},
+		{
+			"claim": "Production deploy workflow gates on npm run check, builds+pushes a GHCR image, copies infra, and writes the env file from GitHub Secrets over SSH.",
+			"citation": ".github/workflows/deploy-prod.yml:10-77"
+		},
+		{
+			"claim": "Env contract is documented as reference-only with secrets sourced from 1Password at runtime, not committed; dev/prod separation via DEV_/PROD_ prefixed secrets.",
+			"citation": ".env.example:1-16"
+		},
+		{
+			"claim": "Reverse proxy with automatic TLS (Caddy) is defined for both dev and prod hosts in the production compose stack.",
+			"citation": "infra/docker-compose.prod.yml:1-27"
+		}
+	],
+	"strengths": [
+		{
+			"point": "Full push-button deploy path: CI check gate, image build, infra copy, and SSH-driven compose up — dev and prod separated.",
+			"citation": ".github/workflows/deploy-prod.yml:61-77"
+		},
+		{
+			"point": "Secrets are kept entirely out of the repo (1Password locally, GitHub Secrets in CI), with .env.example serving only as a manifest.",
+			"citation": ".env.example:1-7"
+		}
+	],
+	"risks": [
+		{
+			"point": "No application logging, metrics, or HTTP health/readiness endpoint — the frontend-only build has ssr=false so there is no server-side observability surface.",
+			"citation": "structural:no-health-endpoint"
+		},
+		{
+			"point": "Production compose images still carry the placeholder YOUR_APP_NAME tag that the README requires hand-editing before first deploy.",
+			"citation": "infra/docker-compose.prod.yml:14-21"
+		}
+	],
+	"score_movers": {
+		"up_one": {
+			"condition": "Add a health/readiness endpoint and structured logging plus startup env validation to reach push-button + observable.",
+			"citation": "src/routes/+layout.ts:1"
+		},
+		"down_one": {
+			"condition": "Break the CI check gate or remove the .env contract so the deploy path is no longer reproducible.",
+			"citation": ".github/workflows/ci.yml:22"
+		}
+	},
+	"structural_evidence": {
+		"no-health-endpoint": {
+			"claim": "No HTTP health/readiness endpoint or server logging exists; the app is client-rendered (ssr=false) with no +server.ts routes.",
+			"basis": ["src/routes/+page.ts:1-7", "command:find-server-routes#exit=0"]
+		}
+	}
+}

@@ -1,0 +1,70 @@
+{
+	"category": "security_failure_handling",
+	"rubric_version": "1.0.0",
+	"raw_score": 4,
+	"score": 4,
+	"cap_applied": false,
+	"cap_reason": null,
+	"weight_pct": 10,
+	"weighted": 8.0,
+	"confidence": "high",
+	"confidence_reason": null,
+	"evidence": [
+		{
+			"claim": "No secrets in source: a grep for AWS/GitHub/Stripe keys, PEM blocks, and inline api-key assignments across src and .env.example returns nothing; .env.example holds placeholders only and routes secrets to 1Password/GitHub Secrets.",
+			"citation": "structural:secrets-in-env-only"
+		},
+		{
+			"claim": "No unsafe execution: no eval, new Function, innerHTML, or {@html} anywhere in the application source.",
+			"citation": "structural:no-unsafe-exec"
+		},
+		{
+			"claim": "All user input is validated before it enters the dataset, and the persisted blob is shape/version-checked on read with a try/catch that re-seeds on corrupt data rather than crashing.",
+			"citation": "src/lib/data/store.svelte.ts:20-41"
+		},
+		{
+			"claim": "Failure handling is explicit, not swallowed: deletion guards return a typed {ok:false, reason} that the UI surfaces, rather than throwing or silently dropping the operation.",
+			"citation": "src/lib/data/operations.ts:81-95"
+		}
+	],
+	"strengths": [
+		{
+			"point": "Trust surface is minimal by design — frontend-only, no network calls, no server input parsing — and every boundary that does exist (form input, localStorage) is validated.",
+			"citation": "src/lib/validation.ts:41-56"
+		},
+		{
+			"point": "The corrupt-payload path degrades gracefully (catch -> re-seed) instead of leaving the app in a broken state.",
+			"citation": "src/lib/data/store.svelte.ts:35-40"
+		}
+	],
+	"risks": [
+		{
+			"point": "Persisted data is read back as Partial<AppData> and cast to AppData after an array-presence check; element-level shape is not deep-validated, so a hand-edited localStorage blob could carry malformed records.",
+			"citation": "src/lib/data/store.svelte.ts:25-33"
+		},
+		{
+			"point": "No SAST/dependency-audit step or threat-model doc in CI; for a frontend-only internal tool the residual risk is low, but it is absent.",
+			"citation": ".github/workflows/ci.yml:9-26"
+		}
+	],
+	"score_movers": {
+		"up_one": {
+			"condition": "Add a dependency-audit/SAST step to CI and deep-validate each persisted record (not just array presence) on hydrate.",
+			"citation": "src/lib/data/store.svelte.ts:26-33"
+		},
+		"down_one": {
+			"condition": "Introduce {@html} or innerHTML rendering of user-supplied report text without sanitization.",
+			"citation": "src/routes/(app)/reports/+page.svelte:119"
+		}
+	},
+	"structural_evidence": {
+		"secrets-in-env-only": {
+			"claim": "No hardcoded credentials in tracked source; secrets are referenced via env/1Password/GitHub Secrets and .env.example contains placeholders only.",
+			"basis": [".env.example:1-16", "command:grep-secrets#exit=1"]
+		},
+		"no-unsafe-exec": {
+			"claim": "No eval, new Function, innerHTML, or {@html} sinks exist in the application source.",
+			"basis": ["command:grep-unsafe-exec#exit=1"]
+		}
+	}
+}

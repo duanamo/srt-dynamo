@@ -1,0 +1,70 @@
+{
+	"category": "architectural_coherence",
+	"rubric_version": "1.0.0",
+	"raw_score": 5,
+	"score": 5,
+	"cap_applied": false,
+	"cap_reason": null,
+	"weight_pct": 15,
+	"weighted": 15.0,
+	"confidence": "high",
+	"confidence_reason": null,
+	"evidence": [
+		{
+			"claim": "Pure domain logic is isolated from reactivity/persistence: operations.ts holds immutable, side-effect-free functions over a plain AppData and never touches localStorage or $state.",
+			"citation": "src/lib/data/operations.ts:1-19"
+		},
+		{
+			"claim": "The reactive shell wraps the pure operations and is the only layer that touches $state and localStorage, delegating every mutation to ops.* — a clean ports/adapters split.",
+			"citation": "src/lib/data/store.svelte.ts:43-110"
+		},
+		{
+			"claim": "Domain types are centralized in one source-of-truth module imported across store, validation, seed, and components; no parallel type definitions.",
+			"citation": "src/lib/types.ts:1-68"
+		},
+		{
+			"claim": "Layering is enforced by direction: operations/seed/validation depend only on $lib/types; the store depends on operations+seed; routes depend on the store — no upward or cross-layer reach observed.",
+			"citation": "structural:no-cross-layer-imports"
+		},
+		{
+			"claim": "Architectural decisions are recorded as ADRs that the code references directly, so a reader can map the storage contract and integrity rule in one pass.",
+			"citation": "decisions/001-srt-localstorage-schema.md:1-44"
+		}
+	],
+	"strengths": [
+		{
+			"point": "Pure/reactive split makes the business rules testable in node without jsdom and keeps framework code out of the domain layer.",
+			"citation": "src/lib/data/operations.ts:1-6"
+		},
+		{
+			"point": "Two accepted ADRs document the load-bearing contracts (persistence envelope, referential-integrity rule) and are cross-linked from the index and the code.",
+			"citation": "decisions/002-srt-referential-integrity.md:1-50"
+		}
+	],
+	"risks": [
+		{
+			"point": "Data access is direct array scans inside operations rather than a repository abstraction; acceptable at MVP scale but a single point that would need rework if a backend is added.",
+			"citation": "src/lib/data/operations.ts:21-31"
+		}
+	],
+	"score_movers": {
+		"up_one": {
+			"condition": "Already at ceiling: boundaries + enforced dep direction + ADRs + clear ownership all present.",
+			"citation": "decisions/README.md:1-9"
+		},
+		"down_one": {
+			"condition": "Introduce a localStorage/$state access inside operations.ts, collapsing the pure/reactive boundary.",
+			"citation": "src/lib/data/operations.ts:1-5"
+		}
+	},
+	"structural_evidence": {
+		"no-cross-layer-imports": {
+			"claim": "The pure domain layer (operations/seed/validation) imports only from $lib/types; the reactive store imports operations+seed; routes import the store — dependency direction points inward with no cross-layer reach.",
+			"basis": [
+				"src/lib/data/operations.ts:7-16",
+				"src/lib/data/store.svelte.ts:6-10",
+				"src/lib/validation.ts:4-13"
+			]
+		}
+	}
+}
