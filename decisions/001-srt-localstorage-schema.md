@@ -1,6 +1,6 @@
 # ADR-001: Client persistence schema for the Status Report Tracker
 
-**Status:** Accepted
+**Status:** Implemented
 **Date:** 2026-06-24
 **Issue:** #9
 

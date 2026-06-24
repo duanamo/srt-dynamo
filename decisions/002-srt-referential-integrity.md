@@ -1,6 +1,6 @@
 # ADR-002: Referential-integrity rule for deletions
 
-**Status:** Accepted
+**Status:** Implemented
 **Date:** 2026-06-24
 **Issue:** #9
 
