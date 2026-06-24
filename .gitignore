@@ -33,3 +33,74 @@ supabase/.temp/
 *.njsproj
 *.sln
 *.sw?
+
+# >>> dynamo-standards (managed v0.1.0) >>>
+# OS / editor
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.swp
+*.swo
+*~
+.idea/
+*.iml
+.vscode/
+.history/
+*.code-workspace
+
+# Secrets / env (.env.example is committed as the env-var contract)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Personal Claude Code state
+.claude/
+CLAUDE.md
+.mcp.json
+
+# Other AI / coding tool state
+.cursor/
+.aider*
+.lodeme/
+
+# But the committed org-standards file is whitelisted.
+!CLAUDE-DYNAMO.md
+
+# Build / log noise
+*.log
+*.pid
+.tmp/
+tmp/
+.cache/
+
+# Merge / patch / backup artefacts
+*.bak
+*.orig
+*.rej
+
+# Node / JS / TS
+node_modules/
+dist/
+build/
+out/
+.next/
+.nuxt/
+.svelte-kit/
+.turbo/
+.parcel-cache/
+*.tsbuildinfo
+.eslintcache
+coverage/
+.nyc_output/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+!CLAUDE-DYNAMO.md
+# <<< dynamo-standards (managed) <<<

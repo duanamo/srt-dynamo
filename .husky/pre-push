@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+# dynamo-standards — husky pre-push (chained): branch-name + promotion guard.
+#
+# stdin carries the pushed-ref lines and must be captured before anything else
+# consumes it; the Dynamo pre-push guard reads them. Skipped when the standards
+# are not installed. Bypass with: git push --no-verify
+DYNAMO_PUSH_REFS=$(cat || true)
+
+# Optional: run the test suite before pushing. Uncomment to enforce.
+# npm test || { echo "Pre-push tests failed (bypass: git push --no-verify)."; exit 1; }
+
+# The guard derives the branch from the pushed-ref lines, so it is intentionally
+# a no-op when stdin is empty (no refs to validate) — do not "fix" this into an
+# always-run; there would be nothing to check.
+if [ -n "$DYNAMO_PUSH_REFS" ] && [ -f "$HOME/.claude/dynamo/githooks/pre-push" ]; then
+    printf '%s\n' "$DYNAMO_PUSH_REFS" | sh "$HOME/.claude/dynamo/githooks/pre-push" "$@" || exit 1
+fi

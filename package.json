@@ -14,6 +14,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
+		"prepare": "husky",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"gen:types": "echo 'ERROR: Update YOUR_PROJECT_ID in this script first (package.json → scripts → gen:types)' && exit 1"
@@ -38,7 +39,9 @@
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.19.0",
 		"globals": "^17.7.0",
+		"husky": "^9.1.7",
 		"layerchart": "^2.0.0-next.48",
+		"lint-staged": "^17.0.8",
 		"prettier": "^3.8.4",
 		"prettier-plugin-svelte": "^4.1.1",
 		"prettier-plugin-tailwindcss": "^0.8.0",

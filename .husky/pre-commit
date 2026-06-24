@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+# dynamo-standards — husky pre-commit (chained)
+#
+# 1. Format + lint only the staged files (fast, via lint-staged).
+# 2. Chain to the installed Dynamo org hook (staged-secrets scan). It is skipped
+#    gracefully when the standards are not installed on this machine (e.g. CI).
+#
+# husky sets core.hooksPath=.husky, which overrides .git/hooks — so /dynamo-init
+# does NOT copy the org hook into .git/hooks for a husky repo; this chain runs it.
+# Bypass everything in an emergency with: git commit --no-verify
+
+npx lint-staged || exit 1
+
+if [ -f "$HOME/.claude/dynamo/githooks/pre-commit" ]; then
+    sh "$HOME/.claude/dynamo/githooks/pre-commit" || exit 1
+fi

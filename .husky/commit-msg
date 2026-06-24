@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# dynamo-standards — husky commit-msg (chained): commit-subject taxonomy.
+# Skipped when the standards are not installed on this machine.
+
+if [ -f "$HOME/.claude/dynamo/githooks/commit-msg" ]; then
+    sh "$HOME/.claude/dynamo/githooks/commit-msg" "$1" || exit 1
+fi
