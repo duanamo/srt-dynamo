@@ -21,7 +21,9 @@
 		oncancel?: () => void;
 	} = $props();
 
-	// Seed the editable form state once from the prop (a fresh form per route).
+	// Seed editable state once from the prop; the form owns it thereafter and is
+	// recreated per route. svelte-ignore silences state_referenced_locally — the
+	// one-time read at init is intentional, not a missed reactive dependency.
 	// svelte-ignore state_referenced_locally
 	const seed = initial;
 	let name = $state(seed?.name ?? '');

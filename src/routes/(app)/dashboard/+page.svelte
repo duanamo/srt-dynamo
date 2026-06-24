@@ -15,6 +15,9 @@
 		FolderKanban
 	} from '@lucide/svelte';
 
+	// `new Date()` is sampled per recomputation (i.e. when store.data changes),
+	// not on every clock tick — a dashboard left open across a month boundary
+	// without any data change shows the prior period until the next mutation/nav.
 	const stats = $derived(dashboardStats(store.data, new Date()));
 
 	let confirmAction = $state<'reset' | 'clear' | null>(null);

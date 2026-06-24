@@ -39,6 +39,7 @@
 		{ value: '', label: 'All periods' },
 		...periods.map((p) => ({ value: p, label: p }))
 	]);
+	// Static, not $derived: built from the OVERALL_STATUSES constant, not store data.
 	const statusOptions = [
 		{ value: '', label: 'All statuses' },
 		...OVERALL_STATUSES.map((s) => ({ value: s, label: s }))
