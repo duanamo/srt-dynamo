@@ -3,6 +3,7 @@ import type { AppData } from '$lib/types';
 import {
 	canDeleteProject,
 	canDeleteUser,
+	createProject,
 	createReport,
 	createUser,
 	dashboardStats,
@@ -10,6 +11,7 @@ import {
 	deleteReport,
 	deleteUser,
 	periodOf,
+	updateProject,
 	updateReport,
 	updateUser
 } from './operations';
@@ -77,6 +79,38 @@ describe('user CRUD', () => {
 			role: 'Executive'
 		});
 		expect(next.users.find((u) => u.id === 'u1')?.name).toBe('Renamed');
+	});
+});
+
+describe('project CRUD', () => {
+	it('creates a project immutably with a generated id', () => {
+		const data = baseData();
+		const { data: next, project } = createProject(data, {
+			name: 'New Project',
+			description: 'desc',
+			status: 'Active',
+			ownerId: 'u1'
+		});
+		expect(project.id).toBeTruthy();
+		expect(next.projects).toHaveLength(3);
+		expect(data.projects).toHaveLength(2); // original not mutated
+	});
+
+	it('updates a project while preserving the id', () => {
+		const { data: next, project } = updateProject(baseData(), 'p1', {
+			name: 'Renamed',
+			description: 'changed',
+			status: 'Complete',
+			ownerId: 'u2'
+		});
+		expect(project).toEqual({
+			id: 'p1',
+			name: 'Renamed',
+			description: 'changed',
+			status: 'Complete',
+			ownerId: 'u2'
+		});
+		expect(next.projects.find((p) => p.id === 'p1')?.status).toBe('Complete');
 	});
 });
 
