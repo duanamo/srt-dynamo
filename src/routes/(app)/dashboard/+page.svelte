@@ -1,32 +1,84 @@
-<div class="space-y-6 max-w-[1600px] mx-auto">
+<script lang="ts">
+	import { store } from '$lib/data/store.svelte';
+	import { dashboardStats } from '$lib/data/operations';
+	import KpiCard from '$lib/components/KpiCard.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import * as Card from '$lib/components/ui/card';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { flash } from '$lib/flash.svelte';
+	import {
+		Activity,
+		CircleAlert,
+		CircleCheck,
+		CircleDot,
+		FileText,
+		FolderKanban
+	} from '@lucide/svelte';
+
+	const stats = $derived(dashboardStats(store.data, new Date()));
+
+	let confirmAction = $state<'reset' | 'clear' | null>(null);
+
+	function run() {
+		if (confirmAction === 'reset') {
+			store.resetToSeed();
+			flash.show('success', 'Data reset to the seed dataset.');
+		} else if (confirmAction === 'clear') {
+			store.clearAll();
+			flash.show('success', 'All data cleared.');
+		}
+		confirmAction = null;
+	}
+</script>
+
+<div class="mx-auto max-w-[1600px] space-y-6">
 	<div>
-		<h2 class="text-2xl font-bold text-foreground">Dashboard</h2>
-		<p class="text-muted-foreground text-sm mt-1">Welcome to your application</p>
+		<h2 class="text-foreground text-2xl font-bold">Dashboard</h2>
+		<p class="text-muted-foreground mt-1 text-sm">An overview of projects and status reports.</p>
 	</div>
 
-	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-		<div
-			class="rounded-lg border bg-card text-card-foreground shadow-xs border-gray-200 dark:border-dark-400 p-6"
-		>
-			<h3 class="text-sm font-medium text-muted-foreground">Getting Started</h3>
-			<p class="text-2xl font-bold text-foreground mt-2">Edit this page</p>
-			<p class="text-xs text-muted-foreground mt-1">src/routes/(app)/dashboard/+page.svelte</p>
-		</div>
-
-		<div
-			class="rounded-lg border bg-card text-card-foreground shadow-xs border-gray-200 dark:border-dark-400 p-6"
-		>
-			<h3 class="text-sm font-medium text-muted-foreground">Navigation</h3>
-			<p class="text-2xl font-bold text-foreground mt-2">Add pages</p>
-			<p class="text-xs text-muted-foreground mt-1">src/lib/config/navigation.ts</p>
-		</div>
-
-		<div
-			class="rounded-lg border bg-card text-card-foreground shadow-xs border-gray-200 dark:border-dark-400 p-6"
-		>
-			<h3 class="text-sm font-medium text-muted-foreground">Database</h3>
-			<p class="text-2xl font-bold text-foreground mt-2">Add tables</p>
-			<p class="text-xs text-muted-foreground mt-1">npm run gen:types</p>
-		</div>
+	<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+		<KpiCard title="Total projects" value={stats.totalProjects} icon={FolderKanban} />
+		<KpiCard title="Active projects" value={stats.activeProjects} icon={Activity} />
+		<KpiCard title="Reports this period" value={stats.reportsThisPeriod} icon={FileText} />
+		<KpiCard title="Green reports" value={stats.green} icon={CircleCheck} />
+		<KpiCard title="Yellow reports" value={stats.yellow} icon={CircleDot} />
+		<KpiCard title="Red reports" value={stats.red} icon={CircleAlert} />
 	</div>
+
+	<Card.Root>
+		<Card.Header>
+			<Card.Title>Data</Card.Title>
+			<Card.Description>
+				This app stores everything in your browser. Reset to the sample dataset or clear it.
+			</Card.Description>
+		</Card.Header>
+		<Card.Content class="flex flex-wrap gap-2">
+			<Button variant="outline" onclick={() => (confirmAction = 'reset')}>Reset to seed data</Button
+			>
+			<Button variant="destructive" onclick={() => (confirmAction = 'clear')}>Clear all data</Button
+			>
+		</Card.Content>
+	</Card.Root>
 </div>
+
+<Dialog.Root bind:open={() => confirmAction !== null, (open) => !open && (confirmAction = null)}>
+	<Dialog.Content>
+		<Dialog.Header>
+			<Dialog.Title>
+				{confirmAction === 'clear' ? 'Clear all data?' : 'Reset to seed data?'}
+			</Dialog.Title>
+			<Dialog.Description>
+				{confirmAction === 'clear'
+					? 'Every user, project, and report will be removed. This can’t be undone.'
+					: 'Your current data will be replaced with the sample dataset.'}
+			</Dialog.Description>
+		</Dialog.Header>
+		<Dialog.Footer>
+			<Button variant="outline" onclick={() => (confirmAction = null)}>Cancel</Button>
+			<Button variant={confirmAction === 'clear' ? 'destructive' : 'default'} onclick={run}>
+				{confirmAction === 'clear' ? 'Clear data' : 'Reset data'}
+			</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>

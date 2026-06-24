@@ -1,4 +1,4 @@
-import { LayoutDashboard } from '@lucide/svelte';
+import { LayoutDashboard, Users, FolderKanban, FileText } from '@lucide/svelte';
 import type { Component } from 'svelte';
 
 export interface NavItem {
@@ -15,12 +15,13 @@ export interface NavSection {
 export const navigationConfig: NavSection[] = [
 	{
 		items: [{ name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard }]
+	},
+	{
+		title: 'Records',
+		items: [
+			{ name: 'Users', path: '/users', icon: Users },
+			{ name: 'Projects', path: '/projects', icon: FolderKanban },
+			{ name: 'Status reports', path: '/reports', icon: FileText }
+		]
 	}
-	// Add more sections:
-	// {
-	// 	title: 'Section Name',
-	// 	items: [
-	// 		{ name: 'Page Name', path: '/page', icon: SomeIcon }
-	// 	]
-	// }
 ];
