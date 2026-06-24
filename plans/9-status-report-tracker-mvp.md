@@ -98,8 +98,10 @@ Reuses the existing system rather than introducing new visuals:
 ## Files / Areas Affected
 
 - **New:** `$lib/types.ts`; `$lib/data/{operations,seed,store.svelte}.ts`; `$lib/validation.ts`; `$lib/components/KpiCard.svelte`; `$lib/components/forms/{User,Project,Report}Form.svelte`; routes `(app)/{users,projects,reports}/...` (list/new/[id]/[id]/edit); tests `$lib/data/operations.test.ts`, `$lib/validation.test.ts`, `$lib/data/seed.test.ts`.
-- **Edited:** `src/routes/+layout.ts` (ssr=false, drop Supabase); `src/routes/(app)/+layout.ts` (drop guard); `src/routes/(app)/dashboard/+page.svelte` (real dashboard); `src/lib/components/layout/TopBar.svelte` (remove logout + session avatar); `src/lib/config/navigation.ts` (add sections); `src/app.d.ts` (simplify); `CHANGELOG.md`.
-- **Deleted:** `src/hooks.server.ts`; `src/routes/+layout.server.ts`; `src/routes/(app)/+layout.server.ts`; `src/routes/login/`; `src/routes/auth/`.
+- **Edited:** `src/routes/+layout.ts` (ssr=false, drop Supabase); `src/routes/(app)/+layout.ts` (drop guard); `src/routes/(app)/dashboard/+page.svelte` (real dashboard); `src/lib/components/layout/TopBar.svelte` (remove logout + session avatar); `src/lib/config/navigation.ts` (add sections); `src/app.d.ts` (simplify).
+- **Created (net-new docs):** `CHANGELOG.md` (none exists — created with the `## [Unreleased]` skeleton per changelog-conventions); `decisions/001-srt-localstorage-schema.md`, `decisions/002-srt-referential-integrity.md`, `decisions/README.md`.
+- **Deleted:** `src/hooks.server.ts`; `src/routes/+layout.server.ts`; `src/routes/(app)/+layout.server.ts`; `src/routes/login/`; `src/routes/auth/`; `src/routes/styleguide/` (scaffold demo page — removed for a clean shipped surface).
+- **Boot note:** `@sveltejs/adapter-node` still runs a Node server even with `ssr=false`; deleting `hooks.server.ts` (which throws on missing `PUBLIC_SUPABASE_*`) is what lets that process boot with no `.env`.
 
 ## Risks and Edge Cases
 
@@ -147,7 +149,14 @@ These may be one ADR (the client data-model contract) or two. Leaning toward two
 | Q2  | Question | Validation: error map or throw?                                                       | **Field→message map** (drives the inline error UX).                                                                                                                                                      |
 | Q3  | Question | "This period" by `reportingPeriod` or `createdAt`?                                    | **`reportingPeriod`** (subject month).                                                                                                                                                                   |
 
-**Recommendation (run 1):** _Re-audit required_ — caused solely by the uncommitted file. After committing the revised plan, a confirmation re-audit is run; its verdict is appended below.
+**Recommendation (run 1):** _Re-audit required_ — caused solely by the uncommitted file. After committing the revised plan, a confirmation re-audit was run; its verdict follows.
+
+**`plan-auditor` run 2 (confirmation), 2026-06-24 — Recommendation: Proceed after minor edits.** All five run-1 substantive risks were verified resolved against the real scaffold (a full `src` grep for `supabase`/`session`/`safeGetSession`/`database.types` maps 1:1 onto the teardown set; the `ssr=false`+`browser` mechanism, the 3-edge RI rule, clock injection, and the no-jsdom pure-test split all confirmed). Residual items, both applied to this plan:
+
+- _Minor:_ `CHANGELOG.md` doesn't exist → relabeled from "Edited" to **Created** (with the `## [Unreleased]` skeleton); `decisions/` is net-new.
+- _Nit:_ leftover `src/routes/styleguide/` demo route → added to the teardown set; plus a one-line `adapter-node` boot note.
+
+The auditor confirmed the two committed ADRs are the only contract-shaping decisions. **Net: cleared to implement.**
 
 <!-- dynamo-plan-audit:end -->
 
