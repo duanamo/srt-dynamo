@@ -1,0 +1,758 @@
+{
+	"rubric_version": "1.0.0",
+	"target": "/private/tmp/dynamo-final",
+	"timestamp_utc": "2026-06-24T18:18:41.474344+00:00",
+	"assessment_scope": "full_repo",
+	"partial": false,
+	"included_categories": ["01", "02", "03", "04", "05", "06", "07", "08", "09"],
+	"classification": {
+		"classification": "software_repo",
+		"declared_maturity": "template",
+		"maturity_basis": "README.md:8",
+		"reason": "package.json with dependencies; src/ has 3+ source files; README has run instruction: 'npm install'; Dockerfile present",
+		"target": "/private/tmp/dynamo-final"
+	},
+	"executive_summary": "Repository scores 86.0/100 — _strong_foundation_ band. Strongest: #01 Architectural coherence (5/5, weight 15%). Weakest: #05 Test strategy (3/5, weight 10%). Highest-leverage improvement: Run the Vitest suite in CI on PRs and add at least a store persistence/hydration integration test..",
+	"repository_maturity": {
+		"stage": "mature_platform",
+		"confidence": "medium",
+		"rationale": [
+			"Overall score 86.0 maps to stage=mature_platform per aggregation rules.",
+			"Declared maturity: template (basis: README.md:8)."
+		]
+	},
+	"scores": {
+		"architectural_coherence": {
+			"category": "architectural_coherence",
+			"rubric_version": "1.0.0",
+			"raw_score": 5,
+			"score": 5,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 15,
+			"weighted": 15.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "Strict layering: pure domain logic (no reactivity, no I/O) lives in operations.ts, with a header documenting the boundary against the reactive shell.",
+					"citation": "src/lib/data/operations.ts:1-5"
+				},
+				{
+					"claim": "The reactive shell is a thin wrapper that delegates every mutation to the pure ops module and only adds $state + persistence — separation of concerns is explicit.",
+					"citation": "src/lib/data/store.svelte.ts:43-110"
+				},
+				{
+					"claim": "Two ADRs pin the load-bearing decisions (storage envelope, deletion rule) as contracts the store, seed, and tests depend on; both Implemented and cross-linked.",
+					"citation": "decisions/001-srt-localstorage-schema.md:1-10"
+				},
+				{
+					"claim": "Domain layer (lib/) never imports from the routes/ layer — dependency direction points inward.",
+					"citation": "structural:no-lib-imports-from-routes"
+				},
+				{
+					"claim": "Domain types are a single hand-written source of truth that components and ops import from; route/page structure mirrors the three entities cleanly.",
+					"citation": "src/lib/types.ts:1-4"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Testability-driven layering: rules are pure functions over a plain AppData, so they unit-test without a DOM while store.svelte.ts owns reactivity and persistence.",
+					"citation": "src/lib/data/operations.ts:1-5"
+				},
+				{
+					"point": "Decisions that impose cross-component contracts are captured as ADRs rather than buried in the diff, with a maintained index.",
+					"citation": "decisions/README.md:1-9"
+				}
+			],
+			"risks": [
+				{
+					"point": "The store singleton is a hard module-level coupling point for every route; acceptable at this size but it is the one global the whole app reaches through.",
+					"citation": "src/lib/data/store.svelte.ts:123"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Already at ceiling — boundaries, enforced dep direction, ADRs, and clear ownership are all present.",
+					"citation": "decisions/001-srt-localstorage-schema.md:1-10"
+				},
+				"down_one": {
+					"condition": "Move referential-integrity rules out of operations.ts into route handlers, dissolving the pure-domain boundary.",
+					"citation": "src/lib/data/operations.ts:84-98"
+				}
+			},
+			"structural_evidence": {
+				"no-lib-imports-from-routes": {
+					"claim": "No file under src/lib imports from src/routes — the domain layer has no upward dependency on the UI layer.",
+					"basis": ["command:grep-lib-imports-routes#exit=1"]
+				}
+			}
+		},
+		"implementation_quality": {
+			"category": "implementation_quality",
+			"rubric_version": "1.0.0",
+			"raw_score": 5,
+			"score": 5,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 15,
+			"weighted": 15.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "svelte-check passes with 0 errors, 0 warnings across 4864 files.",
+					"citation": "command:npm-run-check#exit=0"
+				},
+				{
+					"claim": "ESLint passes clean on the project source with zero findings.",
+					"citation": "command:eslint#exit=0"
+				},
+				{
+					"claim": "Domain functions are small, single-purpose, and immutable (each returns a new AppData); naming carries intent (canDeleteUser, dashboardStats, periodOf).",
+					"citation": "src/lib/data/operations.ts:84-104"
+				},
+				{
+					"claim": "Doc comments across the domain layer explain WHY (injected clock for testable 'this period', the both-edges deletion rule per ADR-002) rather than restating the code.",
+					"citation": "src/lib/data/operations.ts:51-53"
+				},
+				{
+					"claim": "Validation is a clean field-to-message-map pattern reused consistently across user/project/report validators.",
+					"citation": "src/lib/validation.ts:24-31"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Pluralization and human-readable deletion messages are handled carefully and consistently in one place.",
+					"citation": "src/lib/data/operations.ts:88-97"
+				},
+				{
+					"point": "Result-object error returns (ok/reason) instead of thrown exceptions make the failure path explicit and locally reasoned.",
+					"citation": "src/lib/data/operations.ts:19"
+				}
+			],
+			"risks": [
+				{
+					"point": "The only `any` usage is two eslint-disabled generic-type helpers in utils.ts (vendored shadcn pattern), bounded and annotated rather than pervasive.",
+					"citation": "src/lib/utils.ts:8-11"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Already at ceiling — clean naming, intentional abstraction, lint + typecheck enforced and green.",
+					"citation": "command:npm-run-check#exit=0"
+				},
+				"down_one": {
+					"condition": "Introduce significant duplication of the validation field-map logic into route components instead of reusing validation.ts.",
+					"citation": "src/lib/validation.ts:24-60"
+				}
+			},
+			"structural_evidence": {}
+		},
+		"operational_readiness": {
+			"category": "operational_readiness",
+			"rubric_version": "1.0.0",
+			"raw_score": 4,
+			"score": 4,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 15,
+			"weighted": 12.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "Multi-stage Dockerfile builds and runs the adapter-node artifact with a pinned node:24-alpine base and NODE_ENV=production.",
+					"citation": "Dockerfile:1-15"
+				},
+				{
+					"claim": "CI runs on every push/PR to dev and main: type-check + build with pinned Node 24 and npm ci against the committed lockfile.",
+					"citation": ".github/workflows/ci.yml:1-15"
+				},
+				{
+					"claim": "Separate dev/prod deploy workflows push images to GHCR and deploy to EC2, with all secrets injected from GitHub Secrets at runtime (never committed).",
+					"citation": ".github/workflows/deploy-prod.yml:1-30"
+				},
+				{
+					"claim": "README documents install/run/build/test entry points and states no env vars are required for this frontend-only app.",
+					"citation": "README.md:24-55"
+				},
+				{
+					"claim": "Lint and test are NOT run in CI even though both are configured locally and in the husky pre-commit/lint-staged chain.",
+					"citation": ".github/workflows/ci.yml:17-22"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Reproducible builds: lockfile committed, Node pinned via engines and .nvmrc, npm ci in CI and Docker.",
+					"citation": "package.json:6-8"
+				},
+				{
+					"point": "Deploy is effectively push-button per branch (push to dev/main → image build → EC2 compose up).",
+					"citation": ".github/workflows/deploy-dev.yml:1-30"
+				}
+			],
+			"risks": [
+				{
+					"point": "CI gates on check+build but not lint or the 35-test Vitest suite, so a green PR can still ship lint/test regressions.",
+					"citation": ".github/workflows/ci.yml:17-22"
+				},
+				{
+					"point": "No logging/metrics/health endpoint and no env validation at startup — expected for a static client app but limits the operational ceiling.",
+					"citation": "structural:no-health-endpoint"
+				},
+				{
+					"point": "Deploy infra still injects Supabase env vars (template residue) the frontend-only app never reads; harmless but noise on the prod path.",
+					"citation": ".github/workflows/deploy-prod.yml:23-30"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Add lint + test (and a health/readiness probe) to CI so the configured quality gates actually run on PRs.",
+					"citation": ".github/workflows/ci.yml:17"
+				},
+				"down_one": {
+					"condition": "Remove the CI workflow or the Dockerfile so there is no reproducible build/deploy path.",
+					"citation": "Dockerfile:1"
+				}
+			},
+			"structural_evidence": {
+				"no-health-endpoint": {
+					"claim": "No HTTP health/readiness endpoint or structured logger exists; the app is a client-rendered SPA (ssr=false) served by adapter-node.",
+					"basis": ["src/routes/+layout.ts:1-3", "command:grep-health#exit=1"]
+				}
+			}
+		},
+		"type_safety_contracts": {
+			"category": "type_safety_contracts",
+			"rubric_version": "1.0.0",
+			"raw_score": 4,
+			"score": 4,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 10,
+			"weighted": 8.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "TypeScript strict is enabled in the primary tsconfig, with checkJs on.",
+					"citation": "tsconfig.json:11"
+				},
+				{
+					"claim": "svelte-check passes with zero type errors across the whole project.",
+					"citation": "command:npm-run-check#exit=0"
+				},
+				{
+					"claim": "Domain unions are const-asserted arrays driving both the type and runtime validation, so the validator and the type stay in lockstep (single source of truth).",
+					"citation": "src/lib/types.ts:6-13"
+				},
+				{
+					"claim": "Persisted localStorage input — the one true external boundary — is runtime-validated (version + array shape) before being trusted, with a corrupt-payload fallback to re-seed.",
+					"citation": "src/lib/data/store.svelte.ts:20-41"
+				},
+				{
+					"claim": "Form payload types are derived (Omit) from the entity types so ids/timestamps cannot be supplied by a form, enforced statically.",
+					"citation": "src/lib/types.ts:58-62"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Runtime validators re-check membership against the const unions (ROLES/STATUSES) so an out-of-band value is rejected, not just statically discouraged.",
+					"citation": "src/lib/validation.ts:24-31"
+				},
+				{
+					"point": "DeleteResult / DeleteCheck discriminated unions force callers to handle the failure branch.",
+					"citation": "src/lib/data/operations.ts:19"
+				}
+			],
+			"risks": [
+				{
+					"point": "The localStorage shape guard validates only top-level structure (version + arrays), not per-record field types, so a hand-edited but structurally-valid blob could carry malformed records.",
+					"citation": "src/lib/data/store.svelte.ts:26-33"
+				},
+				{
+					"point": "No schema library (Zod/Valibot) and no contract tests — appropriate for a no-backend MVP but the gap to a 5 is the lack of generated/contract-tested boundaries.",
+					"citation": "structural:no-schema-library"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Add a schema validator (e.g. Zod) parsing the persisted blob field-by-field at the localStorage boundary, replacing the hand-rolled shape check.",
+					"citation": "src/lib/data/store.svelte.ts:20-41"
+				},
+				"down_one": {
+					"condition": "Disable strict mode in tsconfig.",
+					"citation": "tsconfig.json:11"
+				}
+			},
+			"structural_evidence": {
+				"no-schema-library": {
+					"claim": "No runtime schema-validation library (Zod/Valibot/Yup) is a dependency; boundary validation is hand-rolled in validation.ts and the store.",
+					"basis": ["package.json:22-25", "src/lib/data/store.svelte.ts:20-41"]
+				}
+			}
+		},
+		"test_strategy": {
+			"category": "test_strategy",
+			"rubric_version": "1.0.0",
+			"raw_score": 3,
+			"score": 3,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 10,
+			"weighted": 6.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "Vitest suite runs and passes: 35 tests across 4 files, all green.",
+					"citation": "command:npm-run-test#exit=0"
+				},
+				{
+					"claim": "Operations tests cover CRUD immutability, both referential-integrity rules (block + allow), and the subtle this-period-by-reportingPeriod-not-createdAt edge case.",
+					"citation": "src/lib/data/operations.test.ts:206-234"
+				},
+				{
+					"claim": "Seed tests assert the ADR-002 demonstrability contract directly — that the dataset proves the deletion rule both ways.",
+					"citation": "src/lib/data/seed.test.ts:42-48"
+				},
+				{
+					"claim": "Validation tests cover happy paths and negative cases including malformed email, invalid period (2026/6 and 2026-13), and missing-reference rejection.",
+					"citation": "src/lib/validation.test.ts:87-100"
+				},
+				{
+					"claim": "Tests are NOT wired into any CI workflow, so they do not gate PRs.",
+					"citation": ".github/workflows/ci.yml:17-22"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Tests target the genuinely load-bearing logic (referential integrity, dashboard period semantics, timestamp preservation on edit) — not coverage padding.",
+					"citation": "src/lib/data/operations.test.ts:179-198"
+				},
+				{
+					"point": "Clock is injected into tested code so time-dependent assertions are deterministic.",
+					"citation": "src/lib/data/operations.test.ts:160-177"
+				}
+			],
+			"risks": [
+				{
+					"point": "Tests are unit-only over pure functions; the reactive store, persistence round-trip, and Svelte components/routes have zero test coverage.",
+					"citation": "structural:no-component-or-store-tests"
+				},
+				{
+					"point": "No CI execution of the suite — a regression that breaks a domain rule would not block a merge.",
+					"citation": ".github/workflows/ci.yml:17-22"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Run the Vitest suite in CI on PRs and add at least a store persistence/hydration integration test.",
+					"citation": ".github/workflows/ci.yml:17"
+				},
+				"down_one": {
+					"condition": "Delete the operations/validation test files, leaving only trivial coverage.",
+					"citation": "src/lib/data/operations.test.ts:1-17"
+				}
+			},
+			"structural_evidence": {
+				"no-component-or-store-tests": {
+					"claim": "All four test files target pure modules (operations, validation, seed, utils); no test exercises store.svelte.ts, components, or routes.",
+					"basis": ["command:find-tests#exit=0", "src/lib/data/store.svelte.ts:1-123"]
+				}
+			}
+		},
+		"scalability_extensibility": {
+			"category": "scalability_extensibility",
+			"rubric_version": "1.0.0",
+			"raw_score": 4,
+			"score": 4,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 10,
+			"weighted": 8.0,
+			"confidence": "medium",
+			"confidence_reason": "Small surface area; extensibility judged from the entity-symmetric module/route structure and the documented scaling assumptions rather than from observed growth.",
+			"evidence": [
+				{
+					"claim": "Adding a new entity follows a clear, repeatable seam: a type in types.ts, a validator, a set of pure ops, store methods, and a parallel route group — each of the three current entities is structured identically.",
+					"citation": "src/lib/data/operations.ts:66-184"
+				},
+				{
+					"claim": "Routes are organized per-entity under (app)/ with new/[id]/[id]/edit sub-routes, so entities (and engineers) don't collide.",
+					"citation": "README.md:59-79"
+				},
+				{
+					"claim": "Scaling assumptions are explicitly ADR'd: single-key whole-blob writes, ~5MB localStorage ceiling, no cross-tab sync — bounded for a single-user internal MVP.",
+					"citation": "decisions/001-srt-localstorage-schema.md:1-10"
+				},
+				{
+					"claim": "No N+1 / unbounded hot-path footguns: dashboard stats are simple array filters over an in-memory dataset of a few hundred rows.",
+					"citation": "src/lib/data/operations.ts:54-64"
+				}
+			],
+			"strengths": [
+				{
+					"point": "The version field in the persisted envelope is a deliberate forward-compatibility hook for future schema migration rather than a crash on stale data.",
+					"citation": "decisions/001-srt-localstorage-schema.md:1-10"
+				},
+				{
+					"point": "Pure-ops + thin-store split means the persistence layer could be swapped (e.g. to a real backend) by reimplementing the store without touching domain rules.",
+					"citation": "src/lib/data/store.svelte.ts:43-110"
+				}
+			],
+			"risks": [
+				{
+					"point": "The whole-dataset rewrite on every mutation and the in-memory full-array scans are O(n) and fine only under the documented MVP volume; they are the first thing to hurt if the tool outgrows its bounds.",
+					"citation": "src/lib/data/store.svelte.ts:16-18"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Introduce a persistence-adapter interface so the localStorage backend is a swappable plugin point with an ADR'd contract.",
+					"citation": "src/lib/data/store.svelte.ts:16-18"
+				},
+				"down_one": {
+					"condition": "Add a per-row loop that re-reads/re-persists the whole blob inside a render hot path.",
+					"citation": "src/lib/data/operations.ts:54-64"
+				}
+			},
+			"structural_evidence": {}
+		},
+		"security_failure_handling": {
+			"category": "security_failure_handling",
+			"rubric_version": "1.0.0",
+			"raw_score": 4,
+			"score": 4,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 10,
+			"weighted": 8.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "No hardcoded secrets in tracked source, CI, or Docker; all deploy secrets are GitHub Secrets injected at runtime, and .env.example holds placeholders only.",
+					"citation": "structural:secrets-in-env-only"
+				},
+				{
+					"claim": "No eval / new Function / innerHTML / dangerous-HTML sinks in application source (UI primitives excluded).",
+					"citation": "command:grep-eval#exit=1"
+				},
+				{
+					"claim": "The localStorage trust boundary is defensively handled: parse is wrapped in try/catch and a corrupt or stale payload falls through to a clean re-seed rather than crashing.",
+					"citation": "src/lib/data/store.svelte.ts:22-41"
+				},
+				{
+					"claim": "All form input flows through validators that reject malformed values and dangling references before any mutation.",
+					"citation": "src/lib/validation.ts:45-60"
+				},
+				{
+					"claim": "Deletion guards fail closed and explain the reason, rather than silently cascading or throwing.",
+					"citation": "src/lib/data/operations.ts:84-98"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Minimal attack surface by design: frontend-only, no auth, no server-side input handling, ssr disabled — fewer trust boundaries to get wrong.",
+					"citation": "src/routes/+layout.ts:1-3"
+				},
+				{
+					"point": "Secret hygiene is reinforced by a husky pre-commit chain that runs the Dynamo staged-secrets scan.",
+					"citation": ".husky/pre-commit:1-18"
+				}
+			],
+			"risks": [
+				{
+					"point": "No SAST/dependency-scanning in CI and no threat model document, which is the gap between 4 and 5.",
+					"citation": "structural:no-sast-in-ci"
+				},
+				{
+					"point": "Persisted data is fully client-trusted: a user editing their own localStorage can inject arbitrary record contents (rendered as text, but unvalidated per-field). Low impact for a single-user local tool.",
+					"citation": "src/lib/data/store.svelte.ts:26-33"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Add a SAST/dependency-audit workflow to CI and document the (minimal) trust model.",
+					"citation": ".github/workflows/ci.yml:1"
+				},
+				"down_one": {
+					"condition": "Introduce a hardcoded secret in tracked source or render persisted data via an HTML sink.",
+					"citation": ".env.example:8-13"
+				}
+			},
+			"structural_evidence": {
+				"secrets-in-env-only": {
+					"claim": "All secret material is referenced via env vars / GitHub Secrets; .env.example contains placeholders only and no secret pattern is present in tracked source, CI, or Docker.",
+					"basis": [".env.example:1-16", "command:grep-hardcoded-secrets#exit=1"]
+				},
+				"no-sast-in-ci": {
+					"claim": "No SAST, CodeQL, or dependency-audit step exists in any CI workflow.",
+					"basis": [".github/workflows/ci.yml:1-15", ".github/workflows/deploy-prod.yml:1-30"]
+				}
+			}
+		},
+		"engineering_discipline": {
+			"category": "engineering_discipline",
+			"rubric_version": "1.0.0",
+			"raw_score": 5,
+			"score": 5,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 10,
+			"weighted": 10.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "Full doc backbone present and accurate: README (rewritten to match the auth-shell removal), CHANGELOG (Keep-a-Changelog format), two cross-linked ADRs with an index, plus a STYLEGUIDE.md.",
+					"citation": "README.md:1-11"
+				},
+				{
+					"claim": "Lint + format + type-check are all configured (ESLint flat config, Prettier, svelte-check) and enforced pre-commit via husky + lint-staged.",
+					"citation": "eslint.config.js:1-46"
+				},
+				{
+					"claim": "ADRs document contract-shaping decisions with Context/Options/Decision/Consequences, both marked Implemented, indexed in decisions/README.md.",
+					"citation": "decisions/README.md:1-9"
+				},
+				{
+					"claim": "Conventional-commit history: feat:/chore: subjects, the MVP merged via squash PR (#9), no wip/fix dump commits.",
+					"citation": "structural:conventional-commit-style"
+				},
+				{
+					"claim": "Dependencies are pinned via a committed lockfile and Node is pinned via engines + .nvmrc.",
+					"citation": "package.json:6-8"
+				}
+			],
+			"strengths": [
+				{
+					"point": "README is a true single onramp — install/run/build/test, layout tree, and a 'How it works' section that points at the ADRs.",
+					"citation": "README.md:81-90"
+				},
+				{
+					"point": "Lint-config carries WHY comments explaining the two intentional rule/ignore choices, rather than silent disables.",
+					"citation": "eslint.config.js:25-44"
+				}
+			],
+			"risks": [
+				{
+					"point": "ESLint ignores src/routes/styleguide/ but that route no longer exists — a stale config reference (minor cleanup debt).",
+					"citation": "eslint.config.js:43"
+				},
+				{
+					"point": "CLAUDE.md is .gitignored (line 63) yet committed and tracked, and it is not Prettier-clean — a small standards/hygiene slip.",
+					"citation": ".gitignore:63"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Already at ceiling — ADRs, cross-linked docs, enforced lint/format, conventional history, pinned deps.",
+					"citation": "decisions/README.md:1-9"
+				},
+				"down_one": {
+					"condition": "Drop the lint/format pre-commit enforcement or let the README drift from the code again.",
+					"citation": ".husky/pre-commit:1-18"
+				}
+			},
+			"structural_evidence": {
+				"conventional-commit-style": {
+					"claim": "All commits use conventional-commit subjects (feat:/chore:) with meaningful messages; the MVP landed as a squash-merge PR, no garbage commits.",
+					"basis": ["command:git-log-sample#exit=0"]
+				}
+			}
+		},
+		"technical_debt_risk": {
+			"category": "technical_debt_risk",
+			"rubric_version": "1.0.0",
+			"raw_score": 4,
+			"score": 4,
+			"cap_applied": false,
+			"cap_reason": null,
+			"weight_pct": 5,
+			"weighted": 4.0,
+			"confidence": "high",
+			"confidence_reason": null,
+			"evidence": [
+				{
+					"claim": "Zero TODO/FIXME/HACK/XXX markers anywhere in application source (UI primitives excluded).",
+					"citation": "command:grep-todos#exit=1"
+				},
+				{
+					"claim": "The debt that exists is template residue and is explicitly declared in the README: the Supabase auth shell was removed and the infra/ dir 'ships with the template and is unused by this app'.",
+					"citation": "README.md:8-10"
+				},
+				{
+					"claim": "No competing/duplicated patterns: one validation style, one store, one persistence path, one deletion-rule definition (ADR-002).",
+					"citation": "src/lib/data/operations.ts:84-143"
+				},
+				{
+					"claim": "Clean, conventional recent history with no churn or revert noise.",
+					"citation": "structural:clean-recent-history"
+				}
+			],
+			"strengths": [
+				{
+					"point": "Brittle assumptions are surfaced as ADR consequences (no cross-tab sync, 5MB ceiling, invariants enforced by code not structure) rather than left implicit.",
+					"citation": "decisions/001-srt-localstorage-schema.md:1-10"
+				}
+			],
+			"risks": [
+				{
+					"point": "Undeclared residue: package.json still lists @supabase/ssr and @supabase/supabase-js deps and a self-erroring gen:types script the frontend-only app never uses; the README declares the infra residue but not these.",
+					"citation": "package.json:22-25"
+				},
+				{
+					"point": "CI build injects unused Supabase stub env vars and the eslint config references a removed styleguide route — small dangling template artifacts.",
+					"citation": ".github/workflows/ci.yml:17-22"
+				}
+			],
+			"score_movers": {
+				"up_one": {
+					"condition": "Strip the unused Supabase dependencies, gen:types script, CI stub env, and stale eslint ignore so the manifest matches the declared frontend-only scope.",
+					"citation": "package.json:22-25"
+				},
+				"down_one": {
+					"condition": "Introduce untracked TODO/FIXME markers in hot paths or let a second persistence pattern coexist with the store.",
+					"citation": "structural:clean-recent-history"
+				}
+			},
+			"structural_evidence": {
+				"clean-recent-history": {
+					"claim": "The full commit history uses meaningful conventional-commit messages with no wip/fix/misc dump commits.",
+					"basis": ["command:git-log-sample#exit=0"]
+				}
+			}
+		}
+	},
+	"overall_score": 86.0,
+	"weighted_sum_partial": null,
+	"band": "strong_foundation",
+	"top_strengths": [
+		{
+			"point": "Testability-driven layering: rules are pure functions over a plain AppData, so they unit-test without a DOM while store.svelte.ts owns reactivity and persistence.",
+			"citation": "src/lib/data/operations.ts:1-5",
+			"category": "architectural_coherence"
+		},
+		{
+			"point": "Pluralization and human-readable deletion messages are handled carefully and consistently in one place.",
+			"citation": "src/lib/data/operations.ts:88-97",
+			"category": "implementation_quality"
+		},
+		{
+			"point": "Reproducible builds: lockfile committed, Node pinned via engines and .nvmrc, npm ci in CI and Docker.",
+			"citation": "package.json:6-8",
+			"category": "operational_readiness"
+		},
+		{
+			"point": "README is a true single onramp — install/run/build/test, layout tree, and a 'How it works' section that points at the ADRs.",
+			"citation": "README.md:81-90",
+			"category": "engineering_discipline"
+		},
+		{
+			"point": "Runtime validators re-check membership against the const unions (ROLES/STATUSES) so an out-of-band value is rejected, not just statically discouraged.",
+			"citation": "src/lib/validation.ts:24-31",
+			"category": "type_safety_contracts"
+		}
+	],
+	"top_risks": [
+		{
+			"point": "Tests are unit-only over pure functions; the reactive store, persistence round-trip, and Svelte components/routes have zero test coverage.",
+			"citation": "structural:no-component-or-store-tests",
+			"category": "test_strategy"
+		},
+		{
+			"point": "CI gates on check+build but not lint or the 35-test Vitest suite, so a green PR can still ship lint/test regressions.",
+			"citation": ".github/workflows/ci.yml:17-22",
+			"category": "operational_readiness"
+		},
+		{
+			"point": "The localStorage shape guard validates only top-level structure (version + arrays), not per-record field types, so a hand-edited but structurally-valid blob could carry malformed records.",
+			"citation": "src/lib/data/store.svelte.ts:26-33",
+			"category": "type_safety_contracts"
+		},
+		{
+			"point": "The whole-dataset rewrite on every mutation and the in-memory full-array scans are O(n) and fine only under the documented MVP volume; they are the first thing to hurt if the tool outgrows its bounds.",
+			"citation": "src/lib/data/store.svelte.ts:16-18",
+			"category": "scalability_extensibility"
+		},
+		{
+			"point": "No SAST/dependency-scanning in CI and no threat model document, which is the gap between 4 and 5.",
+			"citation": "structural:no-sast-in-ci",
+			"category": "security_failure_handling"
+		}
+	],
+	"highest_leverage_improvements": [
+		{
+			"title": "Run the Vitest suite in CI on PRs and add at least a store persistence/hydration integration test.",
+			"impact": "medium",
+			"effort": "medium",
+			"reasoning": "Test strategy scores 3/5 at weight 10% (leverage 4.0). Mover: .github/workflows/ci.yml:17.",
+			"category": "test_strategy",
+			"citation": ".github/workflows/ci.yml:17"
+		},
+		{
+			"title": "Add lint + test (and a health/readiness probe) to CI so the configured quality gates actually run on PRs.",
+			"impact": "medium",
+			"effort": "medium",
+			"reasoning": "Operational readiness scores 4/5 at weight 15% (leverage 3.0). Mover: .github/workflows/ci.yml:17.",
+			"category": "operational_readiness",
+			"citation": ".github/workflows/ci.yml:17"
+		},
+		{
+			"title": "Add a schema validator (e.g. Zod) parsing the persisted blob field-by-field at the localStorage boundary, replacing the hand-rolled shape check.",
+			"impact": "low",
+			"effort": "medium",
+			"reasoning": "Type safety & contracts scores 4/5 at weight 10% (leverage 2.0). Mover: src/lib/data/store.svelte.ts:20-41.",
+			"category": "type_safety_contracts",
+			"citation": "src/lib/data/store.svelte.ts:20-41"
+		},
+		{
+			"title": "Introduce a persistence-adapter interface so the localStorage backend is a swappable plugin point with an ADR'd contract.",
+			"impact": "low",
+			"effort": "medium",
+			"reasoning": "Scalability & extensibility scores 4/5 at weight 10% (leverage 2.0). Mover: src/lib/data/store.svelte.ts:16-18.",
+			"category": "scalability_extensibility",
+			"citation": "src/lib/data/store.svelte.ts:16-18"
+		},
+		{
+			"title": "Add a SAST/dependency-audit workflow to CI and document the (minimal) trust model.",
+			"impact": "low",
+			"effort": "medium",
+			"reasoning": "Security & failure handling scores 4/5 at weight 10% (leverage 2.0). Mover: .github/workflows/ci.yml:1.",
+			"category": "security_failure_handling",
+			"citation": ".github/workflows/ci.yml:1"
+		}
+	],
+	"production_readiness_assessment": "Production-ready across measured dimensions. No specific blockers identified.",
+	"recommended_next_steps": [
+		{
+			"priority": 1,
+			"action": "Run the Vitest suite in CI on PRs and add at least a store persistence/hydration integration test.",
+			"reasoning": "Test strategy scores 3/5 at weight 10% (leverage 4.0). Mover: .github/workflows/ci.yml:17."
+		},
+		{
+			"priority": 2,
+			"action": "Add lint + test (and a health/readiness probe) to CI so the configured quality gates actually run on PRs.",
+			"reasoning": "Operational readiness scores 4/5 at weight 15% (leverage 3.0). Mover: .github/workflows/ci.yml:17."
+		},
+		{
+			"priority": 3,
+			"action": "Add a schema validator (e.g. Zod) parsing the persisted blob field-by-field at the localStorage boundary, replacing the hand-rolled shape check.",
+			"reasoning": "Type safety & contracts scores 4/5 at weight 10% (leverage 2.0). Mover: src/lib/data/store.svelte.ts:20-41."
+		},
+		{
+			"priority": 4,
+			"action": "Introduce a persistence-adapter interface so the localStorage backend is a swappable plugin point with an ADR'd contract.",
+			"reasoning": "Scalability & extensibility scores 4/5 at weight 10% (leverage 2.0). Mover: src/lib/data/store.svelte.ts:16-18."
+		},
+		{
+			"priority": 5,
+			"action": "Add a SAST/dependency-audit workflow to CI and document the (minimal) trust model.",
+			"reasoning": "Security & failure handling scores 4/5 at weight 10% (leverage 2.0). Mover: .github/workflows/ci.yml:1."
+		}
+	],
+	"validation_errors": []
+}

@@ -7,9 +7,14 @@ seeded with sample data on first load.
 
 ## Engineering audit
 
-> **Snapshot:** this audit scores the **one-shot implementation** (commit `6711bb3`) — after the upfront
-> plan + ADRs but before the lifecycle's review polish (extra tests, this README rewrite, CHANGELOG, doc
-> comments). Scored at that point for a fair one-shot comparison; the final lifecycle state scores higher.
+> **One-shot vs full lifecycle — both score 86.** The table below is the **one-shot implementation**
+> (commit `6711bb3`: post-plan/ADRs, pre-review-polish). The **final lifecycle product** (merged PR,
+> commit `0c1e4f6` — README rewrite, CHANGELOG, +tests, doc comments) independently scores the **same 86**
+> ([`.assessment/report-final.md`](.assessment/report-final.md)): the polish landed in categories already
+> at the ceiling (engineering discipline 5/5, implementation 5/5) or capped by CI (test strategy 3/5 —
+> tests still aren't wired into CI), so it improved the product without moving the score. The standards'
+> discipline + architecture gains were banked at _plan_ time, which is why the pre-polish snapshot already
+> scored 86.
 
 Standardized 9-category engineering-quality audit (codebase-audit rubric). Full report:
 [`.assessment/report.md`](.assessment/report.md).
