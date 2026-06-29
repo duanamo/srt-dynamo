@@ -20,8 +20,8 @@
 		"gen:types": "echo 'ERROR: Update YOUR_PROJECT_ID in this script first (package.json → scripts → gen:types)' && exit 1"
 	},
 	"dependencies": {
-		"@supabase/ssr": "^0.10.2",
-		"@supabase/supabase-js": "^2.105.3"
+		"@supabase/ssr": "^0.12.0",
+		"@supabase/supabase-js": "^2.108.2"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
